@@ -1,0 +1,6 @@
+﻿dist/
+node_modules/
+*.exe
+*.blockmap
+*.yml
+settings.json

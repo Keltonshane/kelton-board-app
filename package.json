@@ -1,0 +1,52 @@
+{
+  "name": "kelton-action-board",
+  "version": "1.0.0",
+  "description": "Lawnsmith Plus — Kelton Action Board",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "create-icon": "node create-icon.js",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.lawnsmithplus.keltonboard",
+    "productName": "Kelton Action Board",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "kelton-board.html",
+      "main.js",
+      "preload.js",
+      "settings.json",
+      "assets/**",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Keltonshane",
+      "repo": "kelton-board-app"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Kelton Action Board",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico"
+    }
+  }
+}

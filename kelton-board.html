@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lawnsmith Plus — Kelton</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #b91c1c;
+    --red-deep: #7f1d1d;
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --surface-2: #1a1a1a;
+    --border: #1f1f1f;
+    --text: #f1f5f9;
+    --muted: #475569;
+    --dim: #334155;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    height: 100vh; width: 100vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: var(--text);
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 54px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; gap: 2px; }
+  .logo-main { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 6px; color: var(--red); text-transform: uppercase; }
+  .logo-sub { display: flex; align-items: center; gap: 5px; width: 100%; justify-content: center; }
+  .logo-sub-line { flex: 1; height: 1px; background: var(--red); opacity: 0.5; }
+  .logo-sub-text { font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 4px; color: var(--red); opacity: 0.75; }
+  .header-center { text-align: center; }
+  .header-name { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: 0.5px; }
+  .header-dept { font-size: 10px; color: var(--dim); margin-top: 1px; }
+  .live-pill { display: flex; align-items: center; gap: 7px; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); box-shadow: 0 0 8px rgba(185,28,28,0.8); animation: glow 2s infinite; }
+  @keyframes glow { 0%,100%{box-shadow:0 0 8px rgba(185,28,28,0.8)} 50%{box-shadow:0 0 2px rgba(185,28,28,0.2)} }
+  .live-label { color: var(--red); font-weight: 600; font-size: 11px; }
+  .live-time  { color: var(--dim); font-size: 11px; }
+
+  /* ── PROGRESS ── */
+  .progress-bar { height: 2px; background: #1a1a1a; flex-shrink: 0; }
+  .progress-fill { height: 100%; background: var(--red); transform-origin: left; animation: shrink 45s linear forwards; }
+  @keyframes shrink { from{transform:scaleX(1)} to{transform:scaleX(0)} }
+
+  /* ── WEATHER ── */
+  .weather-bar {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex; gap: 24px; align-items: stretch;
+    flex-shrink: 0;
+  }
+  .weather-current { display: flex; align-items: center; gap: 14px; padding-right: 20px; border-right: 1px solid var(--border); flex-shrink: 0; min-width: 200px; }
+  .weather-icon-big { font-size: 42px; line-height: 1; }
+  .weather-current-info { display: flex; flex-direction: column; gap: 2px; }
+  .weather-temp-big { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; letter-spacing: -1px; }
+  .weather-conditions { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .weather-meta { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .weather-forecast { display: flex; gap: 6px; align-items: stretch; flex-shrink: 0; }
+  .forecast-day { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; text-align: center; min-width: 56px; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+  .forecast-day.today { border-color: var(--red); background: rgba(185,28,28,0.1); }
+  .forecast-day-name { font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .forecast-day.today .forecast-day-name { color: var(--red); }
+  .forecast-icon { font-size: 16px; line-height: 1; margin: 2px 0; }
+  .forecast-temp { font-size: 12px; font-weight: 700; color: var(--text); }
+  .forecast-low  { font-size: 10px; color: var(--muted); }
+  .forecast-rain { font-size: 9px; color: #60a5fa; margin-top: 1px; }
+  .weather-analysis { flex: 1; background: rgba(185,28,28,0.05); border: 1px solid rgba(185,28,28,0.2); border-radius: 10px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+  .weather-analysis-icon { font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+  .weather-analysis-content { flex: 1; min-width: 0; }
+  .weather-analysis-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--red); margin-bottom: 3px; }
+  .weather-analysis-text { font-size: 12px; line-height: 1.5; color: #cbd5e1; }
+  .weather-loading { color: var(--muted); font-style: italic; font-size: 11px; }
+
+  /* ── BRIEFING ── */
+  .briefing-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 28px; flex-shrink: 0; display: none; align-items: flex-start; gap: 10px; }
+  .briefing-bar.visible { display: flex; }
+  .briefing-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  .briefing-content { flex: 1; }
+  .briefing-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--red); margin-bottom: 2px; }
+  .briefing-text  { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+
+  /* ── PENDING QUOTES STRIP ── */
+  /* ── WIDGETS ROW ── */
+  .widgets-row {
+    display: flex;
+    gap: 12px;
+    padding: 10px 28px 12px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  @media (max-width: 900px) { .widgets-row { flex-direction: column; } }
+
+  .widget {
+    flex: 1; min-width: 0;
+    background: var(--surface);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    animation: widgetFadeIn 0.35s ease-out both;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+  }
+  @keyframes widgetFadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+  .widget-quotes { border-color: rgba(185,28,28,0.38); box-shadow: 0 4px 20px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(185,28,28,0.08); }
+  .widget-qj     { border-color: rgba(217,119,6,0.38);  box-shadow: 0 4px 20px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(217,119,6,0.08); }
+
+  .widget-header { display: flex; align-items: center; gap: 8px; padding: 9px 14px 8px; flex-shrink: 0; }
+  .widget-hdr-icon  { font-size: 14px; flex-shrink: 0; }
+  .widget-hdr-title { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: 0.2px; flex: 1; }
+  .widget-badge { font-size: 10px; font-weight: 700; padding: 1px 8px; border-radius: 10px; flex-shrink: 0; min-width: 22px; text-align: center; display: none; }
+  .widget-badge.visible { display: inline-block; }
+  .widget-badge-red   { background: rgba(185,28,28,0.22); border: 1px solid rgba(185,28,28,0.42); color: #fca5a5; }
+  .widget-badge-amber { background: rgba(217,119,6,0.22); border: 1px solid rgba(217,119,6,0.42); color: #fbbf24; }
+  .widget-divider { height: 1px; background: rgba(255,255,255,0.05); flex-shrink: 0; }
+  .widget-body { padding: 8px 14px 10px; flex: 1; display: flex; flex-direction: column; min-height: 50px; }
+  .widget-empty { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 3px; flex: 1; padding: 10px 0 5px; }
+  .widget-empty.visible { display: flex; }
+  .widget-empty-icon { font-size: 16px; color: #22c55e; }
+  .widget-empty-text { font-size: 11px; color: var(--muted); }
+
+  /* ── PENDING QUOTES rows ── */
+  .quotes-list { display: flex; flex-direction: column; max-height: 156px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .quote-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); animation: rowSlideIn 0.2s ease-out both; }
+  .quote-row:last-child { border-bottom: none; }
+  .quote-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .quote-dot-ok     { background: #334155; }
+  .quote-dot-yellow { background: #f59e0b; box-shadow: 0 0 4px rgba(245,158,11,0.6); }
+  .quote-dot-red    { background: #ef4444; box-shadow: 0 0 5px rgba(239,68,68,0.7); animation: quotePulse 2s ease-in-out infinite; }
+  @keyframes quotePulse { 0%,100%{opacity:1} 50%{opacity:0.45} }
+  .quote-customer { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; flex-shrink: 1; }
+  .quote-chip { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 8px; text-transform: uppercase; flex-shrink: 0; }
+  .quote-chip-0 { background: rgba(30,64,175,0.2);  border: 1px solid rgba(30,64,175,0.45);  color: #93c5fd; }
+  .quote-chip-1 { background: rgba(109,40,217,0.2); border: 1px solid rgba(109,40,217,0.45); color: #c4b5fd; }
+  .quote-chip-2 { background: rgba(5,150,105,0.2);  border: 1px solid rgba(5,150,105,0.45);  color: #6ee7b7; }
+  .quote-chip-3 { background: rgba(217,119,6,0.2);  border: 1px solid rgba(217,119,6,0.45);  color: #fcd34d; }
+  .quote-wait { font-size: 11px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+  .quote-wait.wait-yellow { color: #f59e0b; }
+  .quote-wait.wait-red    { color: #ef4444; }
+  .quotes-ai { display: none; align-items: flex-start; gap: 6px; margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.04); }
+  .quotes-ai.visible { display: flex; }
+  .quotes-ai-icon { font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+  .quotes-ai-text { font-size: 11px; color: #fca5a5; line-height: 1.4; }
+
+  /* ── QUICK JOBS rows ── */
+  .qj-list { display: flex; flex-direction: column; max-height: 156px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  @keyframes rowSlideIn { from{opacity:0;transform:translateX(-5px)} to{opacity:1;transform:none} }
+  .qj-row { display: flex; align-items: center; gap: 8px; padding: 4px 2px; border-bottom: 1px solid rgba(255,255,255,0.03); border-radius: 4px; animation: rowSlideIn 0.2s ease-out both; }
+  .qj-row:last-child { border-bottom: none; }
+  .qj-row.is-overdue { animation: qjRowPulse 2.5s ease-in-out infinite; }
+  @keyframes qjRowPulse { 0%,100%{background:transparent} 50%{background:rgba(239,68,68,0.07)} }
+  .qj-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .qj-dot-ok   { background: #22c55e; }
+  .qj-dot-warn { background: #f59e0b; box-shadow: 0 0 4px rgba(245,158,11,0.6); }
+  .qj-dot-red  { background: #ef4444; box-shadow: 0 0 5px rgba(239,68,68,0.7); animation: qjDotPulse 1.6s ease-in-out infinite; }
+  @keyframes qjDotPulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+  .qj-type-icon { font-size: 12px; flex-shrink: 0; }
+  .qj-customer { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; flex-shrink: 1; }
+  .qj-overdue-tag { font-size: 8px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #ef4444; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); padding: 2px 6px; border-radius: 6px; flex-shrink: 0; }
+  .qj-deadline { font-size: 9px; font-weight: 700; letter-spacing: 0.3px; padding: 2px 7px; border-radius: 7px; flex-shrink: 0; }
+  .qj-deadline-ok   { background: rgba(217,119,6,0.12); border: 1px solid rgba(217,119,6,0.3);  color: #fbbf24; }
+  .qj-deadline-warn { background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.45); color: #fbbf24; }
+  .qj-deadline-red  { background: rgba(239,68,68,0.18);  border: 1px solid rgba(239,68,68,0.45);  color: #fca5a5; }
+  .qj-added { font-size: 11px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+  .qj-ai { display: none; align-items: flex-start; gap: 6px; margin-bottom: 6px; padding: 6px 9px; background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.22); border-radius: 6px; }
+  .qj-ai.visible { display: flex; }
+  .qj-ai-icon { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .qj-ai-text { font-size: 11px; color: #fca5a5; line-height: 1.4; }
+
+  /* ── OFFLINE BANNER ── */
+  .offline-banner { display: none; align-items: center; gap: 8px; background: rgba(217,119,6,0.12); border-bottom: 1px solid rgba(217,119,6,0.3); padding: 5px 28px; flex-shrink: 0; }
+  .offline-banner.visible { display: flex; }
+  .offline-icon { font-size: 12px; color: #f59e0b; }
+  .offline-text { font-size: 12px; font-weight: 500; color: #fbbf24; flex: 1; }
+  .offline-elapsed { font-size: 11px; color: var(--muted); }
+
+  /* ── UPDATE TOAST ── */
+  .update-toast { position: fixed; bottom: 24px; right: 24px; z-index: 550; background: var(--surface); border: 1px solid rgba(34,197,94,0.35); border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.55); transform: translateY(16px); opacity: 0; pointer-events: none; transition: all 0.3s ease; min-width: 270px; }
+  .update-toast.visible { transform: none; opacity: 1; pointer-events: auto; }
+  .update-toast-body { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+  .update-toast-icon { font-size: 20px; }
+  .update-toast-info { flex: 1; }
+  .update-toast-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .update-toast-ver   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .update-toast-install { background: #22c55e; border: none; color: #fff; font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 6px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+  .update-toast-install:hover { background: #16a34a; }
+  .update-toast-dismiss { background: none; border: none; color: var(--muted); font-size: 15px; cursor: pointer; padding: 2px 4px; line-height: 1; }
+  .update-toast-dismiss:hover { color: var(--text); }
+
+  /* ── BACK ONLINE TOAST ── */
+  .back-online-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(10px); background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.35); color: #4ade80; font-size: 12px; font-weight: 600; padding: 7px 18px; border-radius: 20px; opacity: 0; transition: all 0.3s ease; z-index: 555; pointer-events: none; white-space: nowrap; }
+  .back-online-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── SETTINGS GEAR ── */
+  .settings-gear { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 6px; margin-left: 10px; transition: color 0.2s; }
+  .settings-gear:hover { color: var(--text); }
+
+  /* ── SETTINGS OVERLAY ── */
+  .settings-overlay { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.72); display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .settings-overlay.visible { display: flex; }
+  .settings-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 600px; max-width: 92vw; max-height: 86vh; display: flex; flex-direction: column; box-shadow: 0 24px 64px rgba(0,0,0,0.7); }
+  .settings-hdr { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px 13px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .settings-hdr-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .settings-hdr-close { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 6px; border-radius: 4px; line-height: 1; }
+  .settings-hdr-close:hover { color: var(--text); }
+  .settings-body { flex: 1; overflow-y: auto; padding: 14px 20px 4px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .settings-section { margin-bottom: 20px; }
+  .settings-section-title { font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(185,28,28,0.2); }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 0; min-height: 30px; }
+  .settings-row label { font-size: 12px; color: var(--text); flex: 1; }
+  .settings-input { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 12px; font-family: inherit; padding: 5px 9px; width: 260px; outline: none; }
+  .settings-input:focus { border-color: rgba(185,28,28,0.5); box-shadow: 0 0 0 2px rgba(185,28,28,0.1); }
+  .settings-input-sm { width: 90px; }
+  .settings-toggle { width: 16px; height: 16px; cursor: pointer; accent-color: var(--red); flex-shrink: 0; }
+  .settings-slider { width: 150px; accent-color: var(--red); cursor: pointer; }
+  .settings-slider-val { font-size: 11px; color: var(--muted); min-width: 30px; text-align: right; flex-shrink: 0; }
+  .settings-ftr { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); flex-shrink: 0; gap: 8px; }
+  .settings-ftr-right { display: flex; gap: 8px; }
+  .settings-btn { font-family: inherit; font-size: 12px; padding: 7px 16px; border-radius: 6px; cursor: pointer; }
+  .settings-btn-logs   { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--dim); }
+  .settings-btn-logs:hover { color: var(--text); }
+  .settings-btn-cancel { background: none; border: 1px solid var(--border); color: var(--dim); }
+  .settings-btn-cancel:hover { color: var(--text); }
+  .settings-btn-save   { background: var(--red); border: none; color: #fff; font-weight: 600; }
+  .settings-btn-save:hover { background: #c92020; }
+  .settings-save-ok { font-size: 11px; color: #22c55e; opacity: 0; transition: opacity 0.3s; }
+  .settings-save-ok.show { opacity: 1; }
+
+  /* ── BOARD WRAPPER ── */
+  .board-wrapper {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+    transition: padding-right 0.45s cubic-bezier(0.22,1,0.36,1);
+  }
+  .board-wrapper.sidebar-active { padding-right: 272px; }
+
+  /* ── CARDS AREA ── */
+  .cards-area {
+    flex: 1; padding: 14px 16px; overflow: hidden;
+    display: flex; flex-wrap: wrap; gap: 12px;
+    align-content: flex-start; align-items: flex-start;
+    min-width: 0;
+  }
+
+  /* ── JOB CARDS ── */
+  .job-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.5); animation: cardIn 0.35s cubic-bezier(0.22,1,0.36,1) both; width: calc((100% - 24px) / 3); display: flex; flex-direction: column; }
+  .job-card.card-fresh      { box-shadow: 0 0 0 2px var(--red), 0 4px 20px rgba(185,28,28,0.3); }
+  .job-card.card-overdue    { box-shadow: 0 0 0 2px #f59e0b, 0 4px 20px rgba(245,158,11,0.2); }
+  .job-card.card-commercial { box-shadow: 0 0 0 2px var(--red), 0 4px 24px rgba(185,28,28,0.4); }
+  @keyframes cardIn { from{opacity:0;transform:translateY(8px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+  @keyframes approvalFlash {
+    0%   { box-shadow: 0 0 0 3px #22c55e, 0 8px 36px rgba(34,197,94,0.55); }
+    55%  { box-shadow: 0 0 0 2px #22c55e, 0 4px 22px rgba(34,197,94,0.25); }
+    100% { box-shadow: 0 0 0 0px transparent, 0 4px 16px rgba(0,0,0,0.5); }
+  }
+  .card-approval-flash { animation: approvalFlash 1.8s ease-out forwards !important; }
+  .card-age-bar { height: 3px; width: 100%; }
+  .card-body { padding: 14px 16px 10px; display: flex; flex-direction: column; gap: 5px; }
+  .card-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .card-title-wrap { display: flex; align-items: flex-start; gap: 7px; flex: 1; min-width: 0; }
+  .equip-icon { font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+  .card-title { font-size: clamp(13px,1.4vw,19px); font-weight: 700; color: #0f172a; line-height: 1.3; letter-spacing: -0.3px; }
+  .primary-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+  .pb-commercial { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+  .pb-overdue    { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+  .pb-repeat     { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+  .pb-complex    { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; }
+  .card-desc { font-size: clamp(10px,0.9vw,12px); color: #64748b; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; margin-top: 4px; }
+  .card-who { display: flex; align-items: center; gap: 5px; min-width: 0; }
+  .who-avatar { width: 18px; height: 18px; border-radius: 50%; font-size: 8px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .who-name { font-size: clamp(9px,0.8vw,11px); font-weight: 500; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-time { font-size: clamp(9px,0.8vw,11px); color: #94a3b8; white-space: nowrap; }
+
+  /* ── AI INSIGHT ── */
+  .ai-insight { background: #1a0808; border-top: 1px solid var(--red-deep); padding: 9px 14px; display: flex; align-items: flex-start; gap: 7px; }
+  .ai-icon { font-size: 11px; flex-shrink: 0; margin-top: 2px; }
+  .ai-text { font-size: clamp(9px,0.85vw,11px); color: #fca5a5; line-height: 1.5; font-weight: 500; }
+  .ai-loading { background: #1a0808; border-top: 1px solid #3d0a0a; padding: 8px 14px; display: flex; align-items: center; gap: 7px; }
+  .ai-spinner { width: 9px; height: 9px; border: 1.5px solid #3d0a0a; border-top-color: var(--red); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .ai-loading-text { font-size: 10px; color: var(--red-deep); font-style: italic; }
+
+  /* ── EOD ── */
+  .eod-overlay {
+    position: relative; z-index: 300;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    flex: 1; gap: 18px; padding: 40px;
+  }
+  .eod-overlay.visible { display: flex; }
+  .eod-title { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700; color: var(--red); letter-spacing: 4px; text-transform: uppercase; }
+  .eod-stats { display: flex; gap: 36px; }
+  .eod-stat { text-align: center; }
+  .eod-stat-val { font-size: 42px; font-weight: 700; color: var(--text); line-height: 1; }
+  .eod-stat-label { font-size: 11px; color: var(--muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .eod-summary { font-size: 16px; color: #cbd5e1; text-align: center; max-width: 700px; line-height: 1.7; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .eod-dismiss-btn { background: none; border: 1px solid var(--dim); color: var(--dim); font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 8px 20px; border-radius: 8px; cursor: pointer; transition: border-color 0.15s, color 0.15s; margin-top: 4px; }
+  .eod-dismiss-btn:hover { border-color: var(--text); color: var(--text); }
+
+  /* ── EMPTY / ERROR ── */
+  .empty-state { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 0; gap: 10px; }
+  .empty-state .icon { font-size: 44px; opacity: 0.25; }
+  .empty-state p  { font-size: 15px; font-weight: 500; color: var(--dim); }
+  .empty-state span { font-size: 12px; color: var(--border); }
+  .error-banner { width: 100%; background: #1a0808; border: 1px solid var(--red-deep); color: #fca5a5; padding: 10px 16px; border-radius: 8px; font-size: 11px; font-family: monospace; }
+
+  /* ── MENTION SIDEBAR (fixed, always above overlays) ── */
+  .mention-sidebar {
+    position: fixed; right: 0; top: 54px; bottom: 0;
+    width: 0; overflow: hidden;
+    display: flex; flex-direction: column;
+    border-left: 0px solid rgba(185,28,28,0.15);
+    background: rgba(8,2,2,0.92);
+    z-index: 500;
+    transition: width 0.45s cubic-bezier(0.22,1,0.36,1),
+                border-left-width 0.45s;
+  }
+  .mention-sidebar.active { width: 272px; border-left-width: 1px; }
+  .mention-toast-area { flex-shrink: 0; padding: 10px 10px 0; }
+  .mention-toast { background: #200606; border: 2px solid var(--red); border-radius: 12px; padding: 14px 14px 10px; box-shadow: -4px 4px 24px rgba(185,28,28,0.45); transform: translateX(110%); animation: toastIn 0.45s cubic-bezier(0.22,1,0.36,1) forwards; margin-bottom: 8px; }
+  @keyframes toastIn { to{transform:translateX(0)} }
+  .mention-toast.toast-leaving { animation: toastOut 0.4s cubic-bezier(0.4,0,1,1) forwards; }
+  @keyframes toastOut { to{opacity:0;transform:translateY(12px) scale(0.93)} }
+  .toast-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .toast-label { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--red); }
+  .toast-bell { display: inline-block; animation: bellRing 0.8s ease-in-out; font-size: 14px; }
+  @keyframes bellRing { 0%,100%{transform:rotate(0)} 15%{transform:rotate(-20deg)} 35%{transform:rotate(20deg)} 55%{transform:rotate(-12deg)} 75%{transform:rotate(12deg)} 90%{transform:rotate(-4deg)} }
+  .toast-author    { font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 2px; }
+  .toast-card-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .toast-comment   { font-size: 11px; color: #64748b; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
+  .toast-progress  { height: 2px; background: var(--red); border-radius: 1px; transform-origin: left; animation: toastProgress 30s linear forwards; }
+  @keyframes toastProgress { from{transform:scaleX(1)} to{transform:scaleX(0)} }
+  .mention-col-header { display: none; align-items: center; gap: 6px; padding: 10px 12px 4px; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); flex-shrink: 0; }
+  .mention-col-header.visible { display: flex; }
+  .mention-col-count { background: var(--red-deep); color: #fca5a5; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 8px; margin-left: auto; }
+  .mention-col-list { flex: 1; overflow-y: auto; padding: 4px 10px 10px; display: flex; flex-direction: column; gap: 6px; scrollbar-width: thin; scrollbar-color: var(--red-deep) transparent; }
+  .mention-col-card { background: #160404; border: 1px solid rgba(185,28,28,0.3); border-radius: 10px; padding: 10px 12px; transform: translateX(30px); opacity: 0; animation: colCardIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards; flex-shrink: 0; }
+  @keyframes colCardIn { to{transform:translateX(0);opacity:1} }
+  .col-card-top     { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .col-card-author  { font-size: 10px; font-weight: 700; color: var(--red); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .col-card-name    { font-size: 11px; font-weight: 600; color: #cbd5e1; line-height: 1.3; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .col-card-comment { font-size: 10px; color: #475569; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px; }
+  .col-card-time    { font-size: 9px; color: var(--dim); }
+  .col-card-progress { height: 1px; background: rgba(185,28,28,0.4); border-radius: 1px; transform-origin: left; margin-top: 6px; animation: colProgress 1800s linear forwards; }
+  @keyframes colProgress { from{transform:scaleX(1)} to{transform:scaleX(0)} }
+  .mention-x { background: none; border: none; color: var(--dim); font-size: 14px; cursor: pointer; line-height: 1; padding: 0; flex-shrink: 0; transition: color 0.15s; }
+  .mention-x:hover { color: var(--text); }
+
+  /* ── MODE OVERLAYS (base) ── */
+  .mode-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: opacity 1.5s ease;
+  }
+  .mode-overlay.active { opacity: 1; pointer-events: all; }
+
+  /* ── SCREENSAVER ── */
+  #screensaverOverlay {
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  #ssCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .ss-content {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0; text-align: center;
+    animation: ssFloat 9s ease-in-out infinite;
+  }
+  @keyframes ssFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  .ss-logo-main { font-family: 'Rajdhani', sans-serif; font-size: 54px; font-weight: 700; letter-spacing: 10px; color: var(--red); text-transform: uppercase; line-height: 1; }
+  .ss-logo-sub  { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 8px; color: var(--red); opacity: 0.5; margin-bottom: 40px; }
+  .ss-clock { font-family: 'Rajdhani', sans-serif; font-size: clamp(90px,11vw,130px); font-weight: 700; color: var(--text); line-height: 1; letter-spacing: -4px; }
+  .ss-ampm  { font-size: 17px; font-weight: 600; color: var(--dim); letter-spacing: 5px; margin-top: 6px; margin-bottom: 10px; }
+  .ss-date  { font-size: 17px; color: var(--muted); font-weight: 400; letter-spacing: 1px; margin-bottom: 32px; }
+  .ss-weather { font-size: 19px; color: var(--text); font-weight: 500; display: flex; align-items: center; gap: 10px; margin-bottom: 48px; }
+  .ss-weather-desc { font-size: 14px; color: var(--muted); }
+  .ss-standby { font-size: 10px; color: var(--dim); letter-spacing: 3px; text-transform: uppercase; animation: standbyPulse 4s ease-in-out infinite; }
+  @keyframes standbyPulse { 0%,100%{opacity:0.3} 50%{opacity:0.7} }
+  .ss-hint { font-size: 10px; color: var(--dim); opacity: 0.4; margin-top: 14px; letter-spacing: 1px; }
+
+  /* ── AFTER HOURS ── */
+  #afterHoursOverlay {
+    background: #070707;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .ah-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(185,28,28,0.06) 0%, transparent 65%); animation: ahBgPulse 10s ease-in-out infinite; }
+  @keyframes ahBgPulse { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.2)} }
+
+  .ah-content {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
+    gap: 20px 40px;
+    max-width: 900px; width: 100%;
+    padding: 50px;
+  }
+
+  /* Logo — top left */
+  .ah-logo { grid-column: 1; grid-row: 1; align-self: center; }
+  .ah-logo-main { font-family: 'Rajdhani', sans-serif; font-size: 30px; font-weight: 700; letter-spacing: 7px; color: var(--red); opacity: 0.65; text-transform: uppercase; line-height: 1; }
+  .ah-logo-sub  { font-size: 10px; letter-spacing: 5px; color: var(--red); opacity: 0.35; }
+
+  /* Clock — top right */
+  .ah-clock-block { grid-column: 2; grid-row: 1; text-align: right; align-self: center; }
+  .ah-clock { font-family: 'Rajdhani', sans-serif; font-size: 52px; font-weight: 700; color: rgba(241,245,249,0.8); line-height: 1; letter-spacing: -2px; }
+  .ah-clock-date { font-size: 12px; color: var(--dim); margin-top: 4px; }
+
+  /* After Hours label — full width */
+  .ah-label { grid-column: 1 / -1; grid-row: 2; text-align: center; }
+  .ah-label-text { font-family: 'Rajdhani', sans-serif; font-size: 38px; font-weight: 700; letter-spacing: 10px; color: var(--red); opacity: 0.55; text-transform: uppercase; }
+  .ah-countdown { font-size: 18px; color: rgba(241,245,249,0.55); font-weight: 400; margin-top: 6px; letter-spacing: 0.5px; }
+
+  /* Weather — left */
+  .ah-weather-box { grid-column: 1; grid-row: 3; background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; }
+  .ah-weather-title { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; }
+  .ah-weather-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ah-weather-icon { font-size: 28px; }
+  .ah-weather-temps { font-size: 22px; font-weight: 700; color: var(--text); }
+  .ah-weather-desc  { font-size: 13px; color: var(--muted); }
+  .ah-weather-rain  { font-size: 12px; color: #60a5fa; margin-left: auto; }
+
+  /* Overnight summary — right */
+  .ah-summary-box { grid-column: 2; grid-row: 3; background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; }
+  .ah-summary-title { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); opacity: 0.7; margin-bottom: 10px; }
+  .ah-summary-text  { font-size: 13px; color: #64748b; line-height: 1.7; flex: 1; }
+
+  /* Divider line */
+  .ah-divider { grid-column: 1 / -1; grid-row: 4; height: 1px; background: var(--border); opacity: 0.5; align-self: end; }
+  .ah-return-btn { margin-top: 22px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: var(--muted); font-size: 11px; font-family: inherit; letter-spacing: 0.5px; padding: 7px 20px; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+  .ah-return-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-main">Lawnsmith</div>
+    <div class="logo-sub">
+      <div class="logo-sub-line"></div>
+      <div class="logo-sub-text">Plus</div>
+      <div class="logo-sub-line"></div>
+    </div>
+  </div>
+  <div class="header-center">
+    <div class="header-name">Kelton — Action Board</div>
+    <div class="header-dept">Outdoor Power Equipment · Deridder, LA</div>
+  </div>
+  <div class="live-pill">
+    <div class="live-dot"></div>
+    <span class="live-label">Live</span>
+    <span class="live-time" id="timestamp">—</span>
+    <button class="settings-gear" id="settingsGearBtn" title="Settings">⚙</button>
+  </div>
+</header>
+
+<div class="offline-banner" id="offlineBanner">
+  <span class="offline-icon">⚠</span>
+  <span class="offline-text">Offline — reconnecting...</span>
+  <span class="offline-elapsed" id="offlineElapsed"></span>
+</div>
+
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="weather-bar" id="weatherBar">
+  <div class="weather-current">
+    <div class="weather-icon-big" id="weatherIcon">⏳</div>
+    <div class="weather-current-info">
+      <div class="weather-temp-big" id="weatherTemp">—°</div>
+      <div class="weather-conditions" id="weatherConditions">Loading...</div>
+      <div class="weather-meta" id="weatherMeta">Deridder, LA</div>
+    </div>
+  </div>
+  <div class="weather-forecast" id="weatherForecast"></div>
+  <div class="weather-analysis">
+    <span class="weather-analysis-icon">🌦</span>
+    <div class="weather-analysis-content">
+      <div class="weather-analysis-label">AI Weather Outlook · Lawnsmith Plus</div>
+      <div class="weather-analysis-text" id="weatherAnalysis">
+        <span class="weather-loading">Analyzing the week's forecast for your shop...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="briefing-bar" id="briefingBar">
+  <span class="briefing-icon">🤖</span>
+  <div class="briefing-content">
+    <div class="briefing-label">Morning Briefing</div>
+    <div class="briefing-text" id="briefingText">Loading briefing...</div>
+  </div>
+</div>
+
+<!-- Widgets row: Pending Quotes + Quick Jobs -->
+<div class="widgets-row" id="widgetsRow">
+
+  <div class="widget widget-quotes" id="quotesStrip">
+    <div class="widget-header">
+      <span class="widget-hdr-icon">📋</span>
+      <span class="widget-hdr-title">Pending Quotes</span>
+      <span class="widget-badge widget-badge-red" id="quotesCount"></span>
+    </div>
+    <div class="widget-divider"></div>
+    <div class="widget-body">
+      <div class="quotes-list" id="quotesList"></div>
+      <div class="quotes-ai"  id="quotesAI"></div>
+      <div class="widget-empty visible" id="quotesEmpty">
+        <div class="widget-empty-icon">✓</div>
+        <div class="widget-empty-text">All quotes processed</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget widget-qj" id="qjStrip">
+    <div class="widget-header">
+      <span class="widget-hdr-icon">⚡</span>
+      <span class="widget-hdr-title">Quick Jobs</span>
+      <span class="widget-badge widget-badge-amber" id="qjCount"></span>
+    </div>
+    <div class="widget-divider"></div>
+    <div class="widget-body">
+      <div class="qj-ai"   id="qjAI"></div>
+      <div class="qj-list" id="qjList"></div>
+      <div class="widget-empty visible" id="qjEmpty">
+        <div class="widget-empty-icon">✓</div>
+        <div class="widget-empty-text">No quick jobs</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Board: cards only (sidebar is fixed outside) -->
+<div class="board-wrapper" id="boardWrapper">
+  <div class="cards-area" id="cardsArea">
+    <div class="empty-state">
+      <div class="icon">⏳</div>
+      <p>Connecting to Trello...</p>
+    </div>
+  </div>
+</div>
+
+<!-- EOD overlay (z-index 300, above mode overlays) -->
+<div class="eod-overlay" id="eodOverlay">
+  <div class="eod-title">End of Day Wrap</div>
+  <div class="eod-stats">
+    <div class="eod-stat">
+      <div class="eod-stat-val" id="eodActive">—</div>
+      <div class="eod-stat-label">Carrying Over</div>
+    </div>
+    <div class="eod-stat">
+      <div class="eod-stat-val" id="eodCommercial">—</div>
+      <div class="eod-stat-label">Commercial</div>
+    </div>
+  </div>
+  <div class="eod-summary" id="eodSummary">Generating summary...</div>
+  <button class="eod-dismiss-btn" id="eodDismissBtn">View Board →</button>
+</div>
+
+<!-- Mention sidebar: fixed, z-index 500, always above overlays -->
+<div class="mention-sidebar" id="mentionSidebar">
+  <div class="mention-toast-area" id="mentionToastArea"></div>
+  <div class="mention-col-header" id="mentionColHeader">
+    <span>🔔</span><span>Mentions</span>
+    <span class="mention-col-count" id="mentionColCount"></span>
+  </div>
+  <div class="mention-col-list" id="mentionColList"></div>
+</div>
+
+<!-- Screensaver overlay: z-index 200 -->
+<div class="mode-overlay" id="screensaverOverlay">
+  <canvas id="ssCanvas"></canvas>
+  <div class="ss-content">
+    <div class="ss-logo-main">Lawnsmith</div>
+    <div class="ss-logo-sub">── Plus ──</div>
+    <div class="ss-clock" id="ssClock">12:00</div>
+    <div class="ss-ampm"  id="ssAmpm">PM</div>
+    <div class="ss-date"  id="ssDate">Tuesday, April 29</div>
+    <div class="ss-weather" id="ssWeather">
+      <span id="ssWeatherIcon">🌤</span>
+      <span id="ssWeatherTemp">—°F</span>
+      <span class="ss-weather-desc" id="ssWeatherDesc">—</span>
+    </div>
+    <div class="ss-standby">· Standing by — watching the board ·</div>
+    <div class="ss-hint">Click or press Escape to return</div>
+  </div>
+</div>
+
+<!-- After Hours overlay: z-index 200 -->
+<div class="mode-overlay" id="afterHoursOverlay">
+  <div class="ah-bg"></div>
+  <div class="ah-content">
+    <div class="ah-logo">
+      <div class="ah-logo-main">Lawnsmith</div>
+      <div class="ah-logo-sub">── Plus ──</div>
+    </div>
+    <div class="ah-clock-block">
+      <div class="ah-clock" id="ahClock">12:00 PM</div>
+      <div class="ah-clock-date" id="ahClockDate">Tuesday, April 29</div>
+    </div>
+    <div class="ah-label">
+      <div class="ah-label-text">After Hours</div>
+      <div class="ah-countdown" id="ahCountdown">Opens in —</div>
+    </div>
+    <div class="ah-weather-box">
+      <div class="ah-weather-title">Tomorrow's Forecast</div>
+      <div class="ah-weather-row" id="ahWeatherRow">
+        <span class="ah-weather-icon">🌤</span>
+        <span class="ah-weather-temps" id="ahWeatherTemps">—</span>
+        <span class="ah-weather-desc"  id="ahWeatherDesc">—</span>
+        <span class="ah-weather-rain"  id="ahWeatherRain"></span>
+      </div>
+    </div>
+    <div class="ah-summary-box">
+      <div class="ah-summary-title">🤖 Overnight Watch</div>
+      <div class="ah-summary-text" id="ahSummaryText">Loading overnight summary...</div>
+    </div>
+    <div class="ah-divider"></div>
+    <button class="ah-return-btn" id="ahReturnBtn">Return to Board</button>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+let TRELLO_KEY    = '';
+let TRELLO_TOKEN  = '';
+let ANTHROPIC_KEY = '';
+let BOARD_NAME    = 'Lawnsmith Plus';
+let LIST_NAME     = 'Kelton';
+let REFRESH_MS    = 45000;
+const WEATHER_REFRESH_MS = 30 * 60 * 1000;
+const OPEN_HOUR  = 7;  const OPEN_MIN  = 30;
+const CLOSE_HOUR = 17; const CLOSE_MIN = 30;
+const BRIEFING_VISIBLE_MIN = 30;
+let LAT = 30.8469; let LON = -93.2860;
+let MENTION_USERNAME    = 'keltondecker';
+const MENTION_DISMISS_MS  = 15 * 60 * 1000;
+
+const KNOWN_COMMERCIAL = ['commercial','lawn care','landscaping','lawn service','mowing service','grounds'];
+const EQUIP_MAP = {
+  '🌿':['trimmer','weedeater','weed eater','edger','blower','leaf blower'],
+  '🚜':['mower','lawn mower','zero turn','zeroturn','riding','tractor','push mower'],
+  '🪚':['chainsaw','chain saw'],
+  '⛽':['generator','pressure washer'],
+};
+
+// ── STATE ───────────────────────────────────────────────
+let boardId = null; let listId = null; let allLists = [];
+let seenIds = new Set();
+let isFirstLoad = true; let eodShown = false;
+let refreshIntervalId = null; let mentionIntervalId = null;
+let isOffline = false; let offlineStart = null; let offlineRetryId = null;
+let weatherCache = null;
+let lastMentionCheck = new Date(Date.now() - 10000).toISOString();
+let shownMentionIds  = new Set();
+const activeMentions = new Map();
+
+// Mode / activity state
+let appSettings = { idleScreensaver: { enabled: true, idleMinutes: 30 }, afterHours: { enabled: true, closedSunday: true } };
+let lastBoardActivityTime = Date.now();
+let lastUserInteractionTime = Date.now();
+let lastSeenCardTimestamps = {};
+let currentMode = 'normal'; // 'normal' | 'screensaver' | 'after-hours'
+let modeRefreshLocked = false; // don't switch during a Trello fetch
+
+// Screensaver state
+let ssAnimFrame = null;
+let ssParticles = [];
+let ssLastSecond = -1;
+
+// After-hours state
+let ahClockTick = null;
+let ahSummaryFetchedAt = null;
+
+// Quotes state
+let quoteListIds   = {};    // { coworkerName: listId }
+let quotesAiFetchedAt = null;
+let quotesAiStaleKey  = ''; // tracks which stale customers the AI note covers
+
+// Quick Jobs state
+let qjOverdueSeen = new Set();  // card IDs that have already fired the overdue sound
+let qjAIFetchedAt = null;
+let qjAIForIds    = '';         // which overdue IDs the current AI message covers
+
+// ── HELPERS ─────────────────────────────────────────────
+function trello(path) {
+  const sep = path.includes('?') ? '&' : '?';
+  return fetch(`https://api.trello.com/1${path}${sep}key=${TRELLO_KEY}&token=${TRELLO_TOKEN}`)
+    .then(r => { if (!r.ok) throw new Error(`Trello ${r.status}`); return r.json(); })
+    .catch(err => { if (err instanceof TypeError) goOffline(); throw err; });
+}
+
+async function claude(prompt, maxTokens = 1000) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    return data.content?.[0]?.text?.trim() ?? null;
+  } catch(e) { console.error('Claude error:', e); return null; }
+}
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1)  return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return `${hrs}h ago`;
+  return `${Math.floor(hrs/24)}d ago`;
+}
+function daysOld(dateStr) { return (Date.now() - new Date(dateStr).getTime()) / 86400000; }
+function initials(name) { if (!name) return '?'; return name.trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+
+const AVT = [['#fee2e2','#991b1b'],['#fef3c7','#92400e'],['#fce7f3','#9d174d'],['#ede9fe','#4c1d95'],['#dbeafe','#1e40af'],['#dcfce7','#166534'],['#cffafe','#164e63'],['#ffedd5','#9a3412']];
+function avatarColor(name) { let h=0; for(let i=0;i<(name||'').length;i++) h=(h*31+name.charCodeAt(i))&0xffffffff; return AVT[Math.abs(h)%AVT.length]; }
+function getEquipIcon(title) { const t=title.toLowerCase(); for(const[icon,words] of Object.entries(EQUIP_MAP)){if(words.some(w=>t.includes(w)))return icon;} return '🔧'; }
+function isCommercial(title,desc) { const t=(title+' '+(desc||'')).toLowerCase(); return KNOWN_COMMERCIAL.some(k=>t.includes(k)); }
+function isComplex(title,desc) { const t=(title+' '+(desc||'')).toLowerCase(); return ['engine','rebuild','carburetor','transmission','overhaul','full service'].some(w=>t.includes(w)); }
+function ageBarColor(card) { const a=daysOld(card.dateLastActivity); if(a<1)return'#22c55e'; if(a<3)return'#86efac'; if(a<5)return'#f59e0b'; if(a<7)return'#f97316'; return'#ef4444'; }
+function pickPrimaryBadge(card,occ) { const a=daysOld(card.dateLastActivity); if(isCommercial(card.name,card.desc))return{cls:'pb-commercial',text:'🏢 Commercial'}; if(a>7)return{cls:'pb-overdue',text:`⚠ ${Math.floor(a)}d old`}; if(occ>2)return{cls:'pb-repeat',text:'Repeat'}; if(isComplex(card.name,card.desc))return{cls:'pb-complex',text:'Complex'}; return null; }
+function extractKeywords(title) { const stop=new Set(['the','a','an','and','or','for','on','in','at','to','is','was','with','of','from','put','get','needs','need','has','have','been','do','did','check','call','please','by','up','that','this','it','be','as','are','its','also','into','onto','off','old','new','about','parts','quote','approved','approval']); return title.toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-z]/g,'')).filter(w=>w.length>2&&!stop.has(w)); }
+function findRelated(myCard,allCards) { const myKw=extractKeywords(myCard.name); if(!myKw.length)return[]; const lm={}; allLists.forEach(l=>lm[l.id]=l.name); const rel=[]; for(const c of allCards){if(c.id===myCard.id||c.idList===listId)continue; const ck=extractKeywords(c.name); if(myKw.filter(k=>ck.includes(k)).length>=1)rel.push({title:c.name,list:lm[c.idList]||'another bucket'});} return rel; }
+function countNameOccurrences(myCard,allCards) { const myKw=extractKeywords(myCard.name); if(!myKw.length)return 0; return allCards.filter(c=>{if(c.id===myCard.id)return false; const ck=extractKeywords(c.name); return myKw.filter(k=>ck.includes(k)).length>=1;}).length; }
+function escapeHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── WEATHER ─────────────────────────────────────────────
+const WEATHER_ICONS = {0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',61:'🌧',63:'🌧',65:'🌧',71:'❄️',73:'❄️',75:'❄️',80:'🌦',81:'🌧',82:'⛈',95:'⛈',96:'⛈',99:'⛈'};
+function weatherDesc(code) { if(code===0)return'Clear'; if(code<=2)return'Partly Cloudy'; if(code===3)return'Cloudy'; if(code<=48)return'Foggy'; if(code<=55)return'Drizzle'; if(code<=65)return'Rain'; if(code<=75)return'Snow'; if(code<=82)return'Showers'; if(code<=99)return'Thunderstorm'; return'Mixed'; }
+
+async function loadWeather() {
+  try {
+    const res  = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode,windspeed_10m,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=7`);
+    const data = await res.json();
+    weatherCache = data;
+
+    const temp = Math.round(data.current.temperature_2m);
+    const code = data.current.weathercode;
+    const wind = Math.round(data.current.windspeed_10m);
+    const hum  = Math.round(data.current.relative_humidity_2m);
+
+    document.getElementById('weatherIcon').textContent       = WEATHER_ICONS[code]||'🌤';
+    document.getElementById('weatherTemp').textContent       = `${temp}°F`;
+    document.getElementById('weatherConditions').textContent = weatherDesc(code);
+    document.getElementById('weatherMeta').textContent       = `Wind ${wind}mph · Humidity ${hum}%`;
+
+    const days  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const today = new Date().getDay();
+    let fHtml = '';
+    for(let i=0;i<7;i++){
+      const dIdx = (today+i)%7;
+      const high = Math.round(data.daily.temperature_2m_max[i]);
+      const low  = Math.round(data.daily.temperature_2m_min[i]);
+      const dc   = data.daily.weathercode[i];
+      const rain = data.daily.precipitation_probability_max[i]||0;
+      fHtml += `<div class="forecast-day ${i===0?'today':''}"><div class="forecast-day-name">${i===0?'Today':days[dIdx]}</div><div class="forecast-icon">${WEATHER_ICONS[dc]||'🌤'}</div><div class="forecast-temp">${high}°</div><div class="forecast-low">${low}°</div>${rain>20?`<div class="forecast-rain">${rain}%</div>`:''}</div>`;
+    }
+    document.getElementById('weatherForecast').innerHTML = fHtml;
+
+    const fSum = [];
+    for(let i=0;i<7;i++){
+      const dn = i===0?'Today':days[(today+i)%7];
+      fSum.push(`${dn}: ${Math.round(data.daily.temperature_2m_max[i])}°/${Math.round(data.daily.temperature_2m_min[i])}° ${weatherDesc(data.daily.weathercode[i])}, ${data.daily.precipitation_probability_max[i]||0}% rain`);
+    }
+
+    const analysis = await claude(
+      `You are a weather analyst for Lawnsmith Plus, an outdoor power equipment shop in Deridder Louisiana. The shop sells and repairs lawnmowers, trimmers, chainsaws, blowers, and generators.\n7-day forecast: ${fSum.join(' | ')}\n\nWrite a 2-3 sentence weather analysis for the shop. Focus on: rain days (drive repair surges 1-2 days after), hot dry stretches (commercial mower breakdowns), storms (chainsaw/generator demand), cold snaps (carb/fuel issues). Be direct, mention specific days. No fluff. Don't start with "Looking ahead".`,
+      400
+    );
+    document.getElementById('weatherAnalysis').textContent = analysis || 'Weather analysis temporarily unavailable.';
+
+    // Update secondary displays if active
+    updateScreensaverWeather();
+    updateAfterHoursWeather();
+
+  } catch(e) {
+    document.getElementById('weatherAnalysis').textContent = 'Weather data unavailable.';
+    console.error(e);
+  }
+}
+
+// ── TRELLO SETUP ────────────────────────────────────────
+async function setup() {
+  if (!boardId) {
+    const boards = await trello('/members/me/boards?fields=name,id');
+    const b = boards.find(x => x.name.toLowerCase() === BOARD_NAME.toLowerCase());
+    if (!b) throw new Error(`Board "${BOARD_NAME}" not found`);
+    boardId = b.id;
+  }
+  if (!listId || !allLists.length) {
+    allLists = await trello(`/boards/${boardId}/lists?fields=name,id`);
+    const l  = allLists.find(x => x.name.toLowerCase() === LIST_NAME.toLowerCase());
+    if (!l) throw new Error(`List "${LIST_NAME}" not found`);
+    listId = l.id;
+  }
+}
+
+async function getCardCreator(cardId) {
+  try {
+    const actions = await trello(`/cards/${cardId}/actions?filter=createCard&fields=memberCreator`);
+    if (actions?.length && actions[0].memberCreator) return actions[0].memberCreator.fullName;
+  } catch(e) {}
+  return null;
+}
+
+// ── PRIORITY ────────────────────────────────────────────
+function priorityScore(card, allCards) {
+  let score = 5;
+  const age = daysOld(card.dateLastActivity);
+  if (age > 7) score += 3; else if (age > 3) score += 2; else if (age < 1) score -= 1;
+  if (isCommercial(card.name, card.desc)) score += 3;
+  if (countNameOccurrences(card, allCards) > 2) score += 1;
+  return Math.min(10, Math.max(1, score));
+}
+
+// ── AI INSIGHT ──────────────────────────────────────────
+async function loadInsight(card, allCards) {
+  const el = document.getElementById(`ai-${card.id}`);
+  if (!el) return;
+  const related = findRelated(card, allCards);
+  const age = daysOld(card.dateLastActivity);
+  const ctx = [];
+  if (related.length) ctx.push(`Related cards: ${related.slice(0,5).map(r=>`"${r.title}" in ${r.list}`).join(', ')}`);
+  if (age > 7) ctx.push(`Over a week old`); else if (age > 3) ctx.push(`${Math.floor(age)} days old`);
+  if (isCommercial(card.name, card.desc)) ctx.push(`Commercial customer — high priority`);
+  if (countNameOccurrences(card, allCards) > 1) ctx.push(`Appears multiple times on the board`);
+  if (isComplex(card.name, card.desc)) ctx.push(`Complex job`);
+  const prompt = ctx.length
+    ? `Shop assistant for Kelton at Lawnsmith Plus Deridder LA. Card: "${card.name}"${card.desc?`\nNotes: ${card.desc}`:''}\nContext: ${ctx.join('. ')}\nONE punchy sentence (max 14 words). Direct. No quotes. No openers like "Note that".`
+    : `Shop assistant for Kelton at Lawnsmith Plus. Card: "${card.name}"${card.desc?`\nNotes: ${card.desc}`:''}\nONE useful sentence (max 14 words) — tip, what to check first, or what to grab. Direct.`;
+  const insight = await claude(prompt, 200);
+  const cur = document.getElementById(`ai-${card.id}`);
+  if (!insight || !cur) { if (cur) cur.remove(); return; }
+  cur.outerHTML = `<div class="ai-insight"><span class="ai-icon">💡</span><span class="ai-text">${insight}</span></div>`;
+}
+
+// ── BRIEFING ────────────────────────────────────────────
+async function loadBriefing(myCards) {
+  document.getElementById('briefingBar').classList.add('visible');
+  const comm   = myCards.filter(c => isCommercial(c.name, c.desc)).length;
+  const oldest = myCards.length ? myCards.reduce((a,b) => daysOld(a.dateLastActivity) > daysOld(b.dateLastActivity) ? a : b) : null;
+  const text   = await claude(
+    `AI assistant for Kelton, outdoor power equipment tech at Lawnsmith Plus Deridder LA. Starting shift.\nQueue: ${myCards.length} jobs. ${comm} commercial.${oldest?`\nOldest: "${oldest.name}" (${Math.floor(daysOld(oldest.dateLastActivity))} days old).`:''}\nCards: ${myCards.map(c=>`"${c.name}"`).join(', ')||'none'}.\n2-3 sentence briefing. What to prioritize. Be direct and practical.`,
+    300
+  );
+  document.getElementById('briefingText').textContent = text || 'Have a great day!';
+}
+
+// ── EOD ─────────────────────────────────────────────────
+async function showEOD(myCards) {
+  if (eodShown) return;
+  eodShown = true;
+  document.getElementById('boardWrapper').style.display = 'none';
+  document.getElementById('weatherBar').style.display   = 'none';
+  document.getElementById('widgetsRow').style.display   = 'none';
+  document.getElementById('briefingBar').classList.remove('visible');
+  document.getElementById('eodOverlay').classList.add('visible');
+  const comm = myCards.filter(c => isCommercial(c.name, c.desc)).length;
+  document.getElementById('eodActive').textContent     = myCards.length;
+  document.getElementById('eodCommercial').textContent = comm;
+  const summary = await claude(
+    `AI assistant for Kelton at Lawnsmith Plus. End of day 5:30pm.\nRemaining: ${myCards.length} jobs. Commercial: ${comm}.\nOpen: ${myCards.map(c=>`"${c.name}"`).join(', ')||'none'}.\n3-4 sentence end of day wrap-up. Note carry-overs, urgent commercial work, brief encouraging note.`,
+    400
+  );
+  document.getElementById('eodSummary').textContent = summary || 'Have a great evening, Kelton!';
+  document.getElementById('eodDismissBtn').addEventListener('click', () => {
+    document.getElementById('eodOverlay').classList.remove('visible');
+    document.getElementById('boardWrapper').style.display = '';
+    document.getElementById('weatherBar').style.display   = '';
+    document.getElementById('widgetsRow').style.display   = '';
+  });
+}
+
+// ── CARD BUILDER ────────────────────────────────────────
+function buildCard(card, creatorName, isFresh, allCards) {
+  const [bg,fg] = avatarColor(creatorName||'?');
+  const occ = countNameOccurrences(card, allCards);
+  const age = daysOld(card.dateLastActivity);
+  let cls = 'job-card';
+  if (isFresh) cls += ' card-fresh';
+  if (age > 7) cls += ' card-overdue';
+  if (isCommercial(card.name, card.desc)) cls += ' card-commercial';
+  const badge = pickPrimaryBadge(card, occ);
+  return `
+    <div class="${cls}" id="card-${card.id}">
+      <div class="card-age-bar" style="background:${ageBarColor(card)}"></div>
+      <div class="card-body">
+        <div class="card-top-row">
+          <div class="card-title-wrap">
+            <span class="equip-icon">${getEquipIcon(card.name)}</span>
+            <div class="card-title">${card.name}</div>
+          </div>
+          ${badge?`<span class="primary-badge ${badge.cls}">${badge.text}</span>`:''}
+        </div>
+        ${card.desc?.trim()?`<div class="card-desc">${card.desc.trim()}</div>`:''}
+        <div class="card-meta">
+          <div class="card-who">
+            ${creatorName?`<div class="who-avatar" style="background:${bg};color:${fg}">${initials(creatorName)}</div><span class="who-name">${creatorName}</span>`:`<span class="who-name" style="color:#94a3b8">—</span>`}
+          </div>
+          <span class="card-time">${timeAgo(card.dateLastActivity)}</span>
+        </div>
+      </div>
+      <div class="ai-loading" id="ai-${card.id}">
+        <div class="ai-spinner"></div>
+        <span class="ai-loading-text">Analyzing...</span>
+      </div>
+    </div>`;
+}
+
+// ── MAIN REFRESH ────────────────────────────────────────
+async function refresh() {
+  if (isOffline) return;
+  const area = document.getElementById('cardsArea');
+  const now  = new Date();
+  const isEOD = now.getHours() > CLOSE_HOUR || (now.getHours() === CLOSE_HOUR && now.getMinutes() >= CLOSE_MIN);
+
+  if (!isEOD) {
+    eodShown = false;
+    document.getElementById('eodOverlay').classList.remove('visible');
+    document.getElementById('boardWrapper').style.display = '';
+    document.getElementById('weatherBar').style.display   = '';
+    document.getElementById('quotesStrip').style.display  = '';
+  }
+
+  const minsAfterOpen = (now.getHours() - OPEN_HOUR) * 60 + (now.getMinutes() - OPEN_MIN);
+  const briefingShouldShow = minsAfterOpen >= 0 && minsAfterOpen <= BRIEFING_VISIBLE_MIN;
+
+  modeRefreshLocked = true;
+  try {
+    document.querySelectorAll('.error-banner').forEach(e => e.remove());
+    await setup();
+
+    const [myCards, allCards] = await Promise.all([
+      trello(`/lists/${listId}/cards?fields=name,desc,dateLastActivity`),
+      trello(`/boards/${boardId}/cards?fields=name,desc,idList,dateLastActivity`)
+    ]);
+
+    // Track board activity for screensaver idle detection
+    checkBoardActivity(myCards);
+
+    // Split before rendering: quick jobs live in their own strip
+    const quickJobs = myCards.filter(isQuickJob);
+    const mainCards = myCards.filter(c => !isQuickJob(c));
+
+    // Snapshot unseen IDs before seenIds update (covers both panels)
+    const newCardIds = new Set(myCards.filter(c => !seenIds.has(c.id)).map(c => c.id));
+
+    const sorted = [...mainCards].sort((a,b) => priorityScore(b,allCards) - priorityScore(a,allCards));
+
+    if (!sorted.length) {
+      area.innerHTML = `<div class="empty-state"><div class="icon">✅</div><p>You're all caught up!</p><span>No pending alerts right now.</span></div>`;
+    } else {
+      const creators = await Promise.all(sorted.map(c => getCardCreator(c.id)));
+      area.innerHTML = sorted.map((card,i) => buildCard(card, creators[i], newCardIds.has(card.id), allCards)).join('');
+
+      // Detect genuinely new cards — skip first load (seenIds empty = just marking baseline)
+      if (!isFirstLoad && newCardIds.size) {
+        const newMain   = sorted.filter(c => newCardIds.has(c.id));
+        const vol       = appSettings.notifications?.volume ?? 0.8;
+        const approvals = newMain.filter(c => /approv(al|ed)/i.test(c.name));
+        const others    = newMain.filter(c => !/approv(al|ed)/i.test(c.name));
+        if (approvals.length && appSettings.notifications?.approvalSound !== false) {
+          playApprovalSound(vol);
+          approvals.forEach(c => flashApprovalCard(c.id));
+        } else if (others.length && appSettings.notifications?.newCardSound !== false) {
+          playNewCardSound(vol);
+        }
+      }
+
+      sorted.forEach(card => loadInsight(card, allCards));
+      if (isFirstLoad && briefingShouldShow) loadBriefing(sorted);
+      else if (!briefingShouldShow) document.getElementById('briefingBar').classList.remove('visible');
+    }
+
+    myCards.forEach(c => seenIds.add(c.id));
+    renderQuickJobs(quickJobs);
+
+    if (isEOD) showEOD([...sorted, ...quickJobs]);
+
+    document.getElementById('timestamp').textContent = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    isFirstLoad = false;
+
+    // Evaluate display mode (not during EOD)
+    if (!document.getElementById('eodOverlay').classList.contains('visible')) {
+      evaluateMode([...sorted, ...quickJobs]);
+    }
+
+    // Refresh pending quotes panel — intentionally not awaited (runs in background)
+    refreshQuotes();
+
+  } catch(err) {
+    const banner = document.createElement('div');
+    banner.className = 'error-banner';
+    banner.textContent = `Error: ${err.message}`;
+    area.prepend(banner);
+  } finally {
+    modeRefreshLocked = false;
+  }
+
+  const bar = document.getElementById('progressFill');
+  bar.style.animation = 'none'; bar.offsetHeight;
+  bar.style.animation = 'shrink 45s linear forwards';
+}
+
+// ── @MENTION DETECTION ──────────────────────────────────
+async function checkMentions() {
+  if (!boardId) return;
+  try {
+    const since   = encodeURIComponent(lastMentionCheck);
+    const actions = await trello(`/boards/${boardId}/actions?filter=commentCard&since=${since}&limit=50&fields=id,date,data,memberCreator`);
+    if (actions.length > 0) lastMentionCheck = actions[0].date;
+
+    for (const action of actions) {
+      if (shownMentionIds.has(action.id)) continue;
+      const commentText = action.data?.text || '';
+      if (commentText.toLowerCase().includes(`@${MENTION_USERNAME}`)) {
+        shownMentionIds.add(action.id);
+        const cardName = action.data?.card?.name || 'a card';
+        const author   = action.memberCreator?.fullName || 'Someone';
+        showMentionToast(action.id, author, cardName, commentText);
+        recordBoardActivity(); // mention = board activity, resets idle timer
+        if (window.electronAPI) {
+          window.electronAPI.notify(
+            `@${MENTION_USERNAME} — ${cardName}`,
+            `${author}: ${commentText.replace(/@\w+/g,'').trim().substring(0,120)}`
+          );
+        }
+        break;
+      }
+    }
+  } catch(e) { console.error('Mention check error:', e); }
+}
+
+function showMentionToast(id, author, cardName, comment) {
+  document.getElementById('mentionSidebar').classList.add('active');
+  document.getElementById('boardWrapper').classList.add('sidebar-active');
+  playAlertSound(appSettings.notifications?.volume ?? 0.8);
+
+  const toast = document.createElement('div');
+  toast.className = 'mention-toast';
+  toast.id = `toast-${id}`;
+  toast.innerHTML = `
+    <div class="toast-top-row">
+      <div class="toast-label"><span class="toast-bell">🔔</span>@keltondecker</div>
+      <button class="mention-x" title="Dismiss">✕</button>
+    </div>
+    <div class="toast-author">${escapeHtml(author)}</div>
+    <div class="toast-card-name">${escapeHtml(cardName)}</div>
+    <div class="toast-comment">${escapeHtml(comment)}</div>
+    <div class="toast-progress"></div>`;
+
+  document.getElementById('mentionToastArea').appendChild(toast);
+  toast.querySelector('.mention-x').addEventListener('click', () => dismissMention(id));
+
+  const toastTimer = setTimeout(() => collapseToastToColumn(id, author, cardName, comment), 30000);
+  activeMentions.set(id, { toastTimer, colTimer: null });
+}
+
+function collapseToastToColumn(id, author, cardName, comment) {
+  const toast = document.getElementById(`toast-${id}`);
+  if (!toast) return;
+  toast.classList.add('toast-leaving');
+  toast.addEventListener('animationend', () => { toast.remove(); addToMentionColumn(id, author, cardName, comment); }, { once: true });
+}
+
+function addToMentionColumn(id, author, cardName, comment) {
+  const colList   = document.getElementById('mentionColList');
+  const colHeader = document.getElementById('mentionColHeader');
+  const card      = document.createElement('div');
+  card.className  = 'mention-col-card';
+  card.id         = `col-${id}`;
+  card.innerHTML  = `
+    <div class="col-card-top">
+      <span class="col-card-author">${escapeHtml(author)}</span>
+      <button class="mention-x" title="Dismiss">✕</button>
+    </div>
+    <div class="col-card-name">${escapeHtml(cardName)}</div>
+    <div class="col-card-comment">${escapeHtml(comment)}</div>
+    <div class="col-card-time">just now</div>
+    <div class="col-card-progress"></div>`;
+
+  colList.prepend(card);
+  card.querySelector('.mention-x').addEventListener('click', () => dismissMention(id));
+  colHeader.classList.add('visible');
+  updateColCount();
+
+  const born = Date.now();
+  const timeTick = setInterval(() => {
+    const el = card.querySelector('.col-card-time');
+    if (el) { const m = Math.floor((Date.now()-born)/60000); el.textContent = m < 1 ? 'just now' : `${m}m ago`; }
+  }, 60000);
+
+  const colTimer = setTimeout(() => { clearInterval(timeTick); dismissMention(id); }, 30 * 60 * 1000);
+  const entry = activeMentions.get(id) || {};
+  entry.colTimer = colTimer;
+  activeMentions.set(id, entry);
+}
+
+function dismissMention(id) {
+  const entry = activeMentions.get(id);
+  if (entry) { if (entry.toastTimer) clearTimeout(entry.toastTimer); if (entry.colTimer) clearTimeout(entry.colTimer); activeMentions.delete(id); }
+  document.getElementById(`toast-${id}`)?.remove();
+  document.getElementById(`col-${id}`)?.remove();
+  updateColCount();
+  const toastArea = document.getElementById('mentionToastArea');
+  const colList   = document.getElementById('mentionColList');
+  if (toastArea.children.length === 0 && colList.children.length === 0) {
+    document.getElementById('mentionSidebar').classList.remove('active');
+    document.getElementById('boardWrapper').classList.remove('sidebar-active');
+    document.getElementById('mentionColHeader').classList.remove('visible');
+  }
+}
+
+function updateColCount() {
+  const n = document.getElementById('mentionColList').children.length;
+  document.getElementById('mentionColCount').textContent = n > 0 ? n : '';
+}
+
+function _playTones(notes, baseGain, vol) {
+  // notes: [[freq, startSec, durationSec, gainScale?], ...]
+  // All sounds use this helper so attack/release envelopes are consistent (no clicks).
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const master = baseGain * Math.max(0, Math.min(1, vol ?? 0.8));
+    for (const [freq, when, dur, scale = 1] of notes) {
+      const osc = ctx.createOscillator();
+      const gn  = ctx.createGain();
+      osc.connect(gn); gn.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const peak = master * scale;
+      const t = ctx.currentTime + when;
+      gn.gain.setValueAtTime(0, t);
+      gn.gain.linearRampToValueAtTime(peak, t + 0.012);     // 12ms attack — no pop
+      gn.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      osc.start(t); osc.stop(t + dur + 0.02);
+    }
+  } catch(e) { console.warn('Audio error:', e); }
+}
+
+// @mention sound — three ascending tones, slightly urgent
+function playAlertSound(vol) {
+  _playTones([
+    [880,  0,    0.32],
+    [1100, 0.28, 0.32],
+    [1320, 0.52, 0.42],
+  ], 0.32, vol);
+}
+
+// Approved quote — C major arpeggio, celebratory bell quality
+function playApprovalSound(vol) {
+  _playTones([
+    [523.25, 0,    0.55],        // C5
+    [659.25, 0.11, 0.60],        // E5
+    [783.99, 0.22, 0.70],        // G5
+    [1046.5, 0.38, 0.48, 0.65],  // C6 — softer shimmer on top
+  ], 0.30, vol);
+}
+
+// Generic new card — calm two-note chime
+function playNewCardSound(vol) {
+  _playTones([
+    [523.25, 0,    0.40],        // C5
+    [659.25, 0.20, 0.48, 0.80],  // E5 (slightly softer)
+  ], 0.26, vol);
+}
+
+// Flash a green approval glow on a card for 1.8s
+function flashApprovalCard(cardId) {
+  const el = document.getElementById(`card-${cardId}`);
+  if (!el) return;
+  el.classList.add('card-approval-flash');
+  setTimeout(() => el.classList.remove('card-approval-flash'), 1900);
+}
+
+// ── PENDING QUOTES ───────────────────────────────────────
+function cardCreatedAt(cardId) {
+  // First 8 hex chars of a Trello/BSON ObjectID encode Unix seconds
+  return new Date(parseInt(cardId.substring(0, 8), 16) * 1000);
+}
+
+function quoteWaitStr(cardId) {
+  const diffMs = Date.now() - cardCreatedAt(cardId).getTime();
+  const mins   = Math.floor(diffMs / 60000);
+  if (mins < 60)  return `${Math.max(1, mins)}m waiting`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24)   return `${hrs}h waiting`;
+  return `${Math.floor(hrs / 24)}d waiting`;
+}
+
+function quoteAgeDays(cardId) {
+  return (Date.now() - cardCreatedAt(cardId).getTime()) / 86400000;
+}
+
+function quoteDotClass(ageDays) {
+  if (ageDays >= 4) return 'quote-dot-red';
+  if (ageDays >= 2) return 'quote-dot-yellow';
+  return 'quote-dot-ok';
+}
+
+function quoteWaitClass(ageDays) {
+  if (ageDays >= 4) return 'wait-red';
+  if (ageDays >= 2) return 'wait-yellow';
+  return '';
+}
+
+function quoteChipClass(coworkerName) {
+  const list = appSettings.quoteCoworkers || ['Preston', 'Trey'];
+  const idx  = list.findIndex(c => c.toLowerCase() === coworkerName.toLowerCase());
+  return `quote-chip-${Math.max(0, idx) % 4}`;
+}
+
+function renderQuotes(quotes) {
+  const list  = document.getElementById('quotesList');
+  const badge = document.getElementById('quotesCount');
+  const empty = document.getElementById('quotesEmpty');
+  if (!list) return;
+
+  if (!quotes.length) {
+    list.innerHTML = '';
+    if (badge) { badge.textContent = ''; badge.classList.remove('visible'); }
+    if (empty) empty.classList.add('visible');
+    return;
+  }
+
+  if (empty) empty.classList.remove('visible');
+  const n = quotes.length;
+  if (badge) { badge.textContent = n; badge.classList.add('visible'); }
+
+  list.innerHTML = quotes.map(q => {
+    const wc = quoteWaitClass(q.ageDays);
+    return `<div class="quote-row">
+      <div class="quote-dot ${quoteDotClass(q.ageDays)}"></div>
+      <span class="quote-customer">${escapeHtml(q.customer)}</span>
+      <span class="quote-chip ${quoteChipClass(q.coworker)}">${escapeHtml(q.coworker)}</span>
+      <span class="quote-wait${wc ? ' ' + wc : ''}">${q.waitStr}</span>
+    </div>`;
+  }).join('');
+}
+
+async function refreshQuotes() {
+  if (!boardId || !allLists.length) return;
+  const coworkers = appSettings.quoteCoworkers || ['Preston', 'Trey'];
+
+  try {
+    // Resolve list IDs for any coworker not yet cached
+    for (const name of coworkers) {
+      if (!quoteListIds[name]) {
+        const found = allLists.find(l => l.name.toLowerCase() === name.toLowerCase());
+        if (found) quoteListIds[name] = found.id;
+      }
+    }
+
+    // Fetch quote cards from all coworker lists in parallel
+    const results = await Promise.all(
+      coworkers.map(async (name) => {
+        const lid = quoteListIds[name];
+        if (!lid) return [];
+        const cards = await trello(`/lists/${lid}/cards?fields=name,id`);
+        return cards
+          .filter(c => /^quote\b/i.test(c.name.trim()))
+          .map(c => ({
+            id:       c.id,
+            customer: c.name.replace(/^quote\s*/i, '').trim() || c.name,
+            coworker: name,
+            ageDays:  quoteAgeDays(c.id),
+            waitStr:  quoteWaitStr(c.id),
+          }));
+      })
+    );
+
+    const allQuotes = results.flat().sort((a, b) => b.ageDays - a.ageDays); // oldest first
+    renderQuotes(allQuotes);
+
+    // AI stale note — quotes older than 3 days
+    const stale    = allQuotes.filter(q => q.ageDays > 3);
+    const aiEl     = document.getElementById('quotesAI');
+    const staleKey = stale.map(q => q.id).join(',');
+
+    if (stale.length && (staleKey !== quotesAiStaleKey || !quotesAiFetchedAt || Date.now() - quotesAiFetchedAt > 30 * 60 * 1000)) {
+      quotesAiFetchedAt = Date.now();
+      quotesAiStaleKey  = staleKey;
+      const list = stale.map(q => `${q.customer} with ${q.coworker} (${Math.floor(q.ageDays)}d)`).join(', ');
+      const note = await claude(
+        `Shop assistant for Kelton at Lawnsmith Plus. Stale pending quotes (waiting on a price approval): ${list}.\nWrite ONE direct follow-up reminder, max 18 words. Lead with the longest-waiting customer. No opener words.`,
+        120
+      );
+      if (aiEl && note) {
+        aiEl.innerHTML = `<span class="quotes-ai-icon">💡</span><span class="quotes-ai-text">${escapeHtml(note)}</span>`;
+        aiEl.classList.add('visible');
+      }
+    } else if (!stale.length && aiEl) {
+      aiEl.innerHTML = '';
+      aiEl.classList.remove('visible');
+      quotesAiFetchedAt = null;
+      quotesAiStaleKey  = '';
+    }
+
+  } catch(e) {
+    console.error('Quotes refresh error:', e);
+  }
+}
+
+// ── QUICK JOBS ───────────────────────────────────────────
+
+// Detect "done by" cards
+const isQuickJob = c => /(?:done\s+by|tomorrow\s+by|\bby\s+\d)/i.test(c.name);
+
+// Extract job type icon from title keywords
+function qjIcon(title) {
+  const t = title.toLowerCase();
+  if (/pull\s*(rope|cord|start)|recoil/i.test(t))   return '🪢';
+  if (/chain\s*sharp|sharpen.*chain|chain.*sharp/i.test(t)) return '⛓️';
+  if (/blade\s*sharp|sharpen.*blade|blade.*sharp/i.test(t)) return '🔪';
+  if (/spark\s*plug/i.test(t))                        return '⚡';
+  return '🔧';
+}
+
+// Strip the "done by [time] [tomorrow]" clause, leaving just the customer/job text
+function qjCustomer(title) {
+  return title.replace(/\s*(?:(?:done|tomorrow)\s+by|by)\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)?(?:\s+tomorrow)?/i, '').trim();
+}
+
+// Parse deadline datetime from card title + card creation date
+function qjDeadline(card) {
+  const title = card.name;
+  const m = title.match(/(?:(?:done|tomorrow)\s+by|by)\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+
+  if (!m) {
+    // No parseable time — fall back to card creation + 1 day + overdueHour
+    const dl = new Date(cardCreatedAt(card.id));
+    dl.setDate(dl.getDate() + 1);
+    dl.setHours(appSettings.quickJobs?.overdueHour ?? 8, 0, 0, 0);
+    return dl;
+  }
+
+  let hour = parseInt(m[1]);
+  const mins = m[2] ? parseInt(m[2]) : 0;
+  const ampm = m[3]?.toLowerCase();
+  const hasTomorrow = /tomorrow/i.test(title);
+
+  // Determine 24h hour
+  if (ampm === 'pm' && hour !== 12) hour += 12;
+  else if (ampm === 'am' && hour === 12) hour = 0;
+  else if (!ampm) {
+    // No am/pm: shop heuristic — 1-6 = afternoon (5pm close), 7-11 = morning (8am open)
+    if (hour >= 1 && hour <= 6) hour += 12;
+  }
+
+  const dl = new Date();
+  dl.setHours(hour, mins, 0, 0);
+
+  if (hasTomorrow || dl <= new Date()) {
+    dl.setDate(dl.getDate() + 1);
+  }
+  return dl;
+}
+
+function qjDeadlineLabel(deadline, isOverdue) {
+  if (isOverdue) {
+    const hoursOver = Math.floor((Date.now() - deadline.getTime()) / 3600000);
+    return hoursOver < 1 ? 'just overdue' : `${hoursOver}h overdue`;
+  }
+  const now = new Date();
+  const isToday    = deadline.toDateString() === now.toDateString();
+  const isTomorrow = deadline.toDateString() === new Date(now.getTime() + 86400000).toDateString();
+  const t = deadline.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  if (isToday)    return `by ${t} today`;
+  if (isTomorrow) return `by ${t} tomorrow`;
+  return `by ${t} ${deadline.toLocaleDateString('en-US', { weekday: 'short' })}`;
+}
+
+// Distinct overdue sound — descending double-pair, urgent feel
+function playOverdueSound(vol) {
+  _playTones([
+    [831, 0,    0.22],
+    [622, 0.19, 0.30],
+    [831, 0.54, 0.22],
+    [622, 0.73, 0.42, 0.9],
+  ], 0.34, vol);
+}
+
+async function loadQJOverdueAI(overdueJobs) {
+  const ids = overdueJobs.map(j => j.id).join(',');
+  if (ids === qjAIForIds && qjAIFetchedAt && Date.now() - qjAIFetchedAt < 20 * 60 * 1000) return;
+  qjAIForIds    = ids;
+  qjAIFetchedAt = Date.now();
+
+  const list = overdueJobs.map(j => `${j.customer} (${qjDeadlineLabel(j.deadline, true)})`).join(', ');
+  const note = await claude(
+    `Shop assistant for Kelton at Lawnsmith Plus. Overdue quick jobs still on the board: ${list}.\nWrite ONE urgent heads-up sentence (max 18 words). Name the most overdue job first. No opener words.`,
+    100
+  );
+  const aiEl = document.getElementById('qjAI');
+  if (aiEl && note) {
+    aiEl.innerHTML = `<span class="qj-ai-icon">⚠️</span><span class="qj-ai-text">${escapeHtml(note)}</span>`;
+    aiEl.classList.add('visible');
+  }
+}
+
+function renderQuickJobs(rawCards) {
+  const strip = document.getElementById('qjStrip');
+  const list  = document.getElementById('qjList');
+  const aiEl  = document.getElementById('qjAI');
+  const badge = document.getElementById('qjCount');
+  const empty = document.getElementById('qjEmpty');
+  if (!strip) return;
+
+  // Respect enabled toggle
+  const row = document.getElementById('widgetsRow');
+  if (appSettings.quickJobs?.enabled === false) {
+    strip.style.display = 'none';
+    return;
+  }
+  strip.style.display = '';
+
+  if (!rawCards.length) {
+    list.innerHTML = '';
+    if (badge) { badge.textContent = ''; badge.classList.remove('visible'); }
+    if (empty) empty.classList.add('visible');
+    if (aiEl) { aiEl.innerHTML = ''; aiEl.classList.remove('visible'); }
+    return;
+  }
+
+  // Build job objects with parsed deadlines
+  const jobs = rawCards.map(card => {
+    const deadline  = qjDeadline(card);
+    const isOverdue = Date.now() > deadline.getTime();
+    const msLeft    = deadline.getTime() - Date.now();
+    return {
+      id:       card.id,
+      customer: qjCustomer(card.name),
+      deadline,
+      isOverdue,
+      msLeft,
+      addedStr: quoteWaitStr(card.id),
+      icon:     qjIcon(card.name),
+    };
+  });
+
+  // Overdue rows float to the top; within each group sort by soonest deadline
+  jobs.sort((a, b) => {
+    if (a.isOverdue !== b.isOverdue) return a.isOverdue ? -1 : 1;
+    return a.deadline - b.deadline;
+  });
+
+  const overdueJobs = jobs.filter(j => j.isOverdue);
+  const n = jobs.length;
+  if (empty) empty.classList.remove('visible');
+  if (badge) { badge.textContent = n; badge.classList.add('visible'); }
+
+  list.innerHTML = jobs.map(j => {
+    const deadlineCls = j.isOverdue             ? 'qj-deadline-red'
+                      : j.msLeft < 2*3600*1000   ? 'qj-deadline-warn'
+                                                 : 'qj-deadline-ok';
+    const dotCls      = j.isOverdue             ? 'qj-dot-red'
+                      : j.msLeft < 2*3600*1000   ? 'qj-dot-warn'
+                                                 : 'qj-dot-ok';
+    const overdueBadge = j.isOverdue ? `<span class="qj-overdue-tag">OVERDUE</span>` : '';
+    return `<div class="qj-row${j.isOverdue ? ' is-overdue' : ''}">
+      <div class="qj-dot ${dotCls}"></div>
+      <span class="qj-type-icon">${j.icon}</span>
+      <span class="qj-customer">${escapeHtml(j.customer)}</span>
+      ${overdueBadge}
+      <span class="qj-deadline ${deadlineCls}">${qjDeadlineLabel(j.deadline, j.isOverdue)}</span>
+      <span class="qj-added">${j.addedStr}</span>
+    </div>`;
+  }).join('');
+
+  // Overdue sound — fire once per card ID
+  if (overdueJobs.length && appSettings.quickJobs?.overdueSound !== false) {
+    const vol = appSettings.notifications?.volume ?? 0.8;
+    for (const j of overdueJobs) {
+      if (!qjOverdueSeen.has(j.id)) {
+        qjOverdueSeen.add(j.id);
+        playOverdueSound(vol);
+        if (window.electronAPI) {
+          window.electronAPI.notify(
+            '⚠ Quick Job Overdue',
+            `${j.customer} — ${qjDeadlineLabel(j.deadline, true)}`
+          );
+        }
+        break; // one sound at a time
+      }
+    }
+  }
+
+  // AI overdue message (async, non-blocking)
+  if (overdueJobs.length) {
+    loadQJOverdueAI(overdueJobs);
+  } else if (aiEl) {
+    aiEl.innerHTML = '';
+    aiEl.classList.remove('visible');
+    qjAIFetchedAt = null;
+    qjAIForIds    = '';
+  }
+}
+
+// ── SETTINGS ────────────────────────────────────────────
+async function loadSettings() {
+  if (window.electronAPI?.readSettings) {
+    try {
+      const s = await window.electronAPI.readSettings();
+      appSettings = s;
+      applySettingsToConfig(s);
+    } catch(e) {}
+  }
+}
+
+function applySettingsToConfig(s) {
+  if (s.trello?.key)        TRELLO_KEY   = s.trello.key;
+  if (s.trello?.token)      TRELLO_TOKEN = s.trello.token;
+  if (s.trello?.boardName)  BOARD_NAME   = s.trello.boardName;
+  if (s.trello?.listName)   LIST_NAME    = s.trello.listName;
+  if (s.anthropic?.key)     ANTHROPIC_KEY = s.anthropic.key;
+  if (s.weather?.lat != null) LAT = s.weather.lat;
+  if (s.weather?.lon != null) LON = s.weather.lon;
+  if (s.mention?.username)  MENTION_USERNAME = s.mention.username;
+  if (s.refreshInterval)    REFRESH_MS = s.refreshInterval * 1000;
+}
+
+// ── ACTIVITY TRACKING ────────────────────────────────────
+function recordUserActivity() {
+  lastUserInteractionTime = Date.now();
+  if (currentMode === 'screensaver') switchMode('normal');
+}
+
+function recordBoardActivity() {
+  lastBoardActivityTime = Date.now();
+  if (currentMode === 'screensaver') switchMode('normal');
+}
+
+function checkBoardActivity(cards) {
+  const isFirst = Object.keys(lastSeenCardTimestamps).length === 0;
+  let changed = false;
+  for (const card of cards) {
+    const prev = lastSeenCardTimestamps[card.id];
+    if (!isFirst) {
+      if (prev === undefined) changed = true;                          // new card
+      if (prev !== undefined && prev !== card.dateLastActivity) changed = true; // updated
+    }
+    lastSeenCardTimestamps[card.id] = card.dateLastActivity;
+  }
+  if (changed) recordBoardActivity();
+}
+
+// ── MODE CONTROLLER ──────────────────────────────────────
+function isAfterHoursNow() {
+  const now = new Date();
+  const h = now.getHours(); const m = now.getMinutes(); const day = now.getDay();
+  const isSunday     = day === 0 && appSettings.afterHours?.closedSunday !== false;
+  const isBeforeOpen = h < OPEN_HOUR || (h === OPEN_HOUR && m < OPEN_MIN);
+  const isAfterClose = h > CLOSE_HOUR || (h === CLOSE_HOUR && m >= CLOSE_MIN);
+  return isSunday || isBeforeOpen || isAfterClose;
+}
+
+function evaluateMode(myCards) {
+  if (modeRefreshLocked) return;
+  if (isAfterHoursNow() && appSettings.afterHours?.enabled) { switchMode('after-hours', myCards); return; }
+  const idleMs = (appSettings.idleScreensaver?.idleMinutes || 30) * 60 * 1000;
+  const idle = (Date.now() - lastBoardActivityTime > idleMs) && (Date.now() - lastUserInteractionTime > idleMs);
+  if (idle && appSettings.idleScreensaver?.enabled) { switchMode('screensaver'); return; }
+  switchMode('normal');
+}
+
+function switchMode(newMode, myCards) {
+  if (currentMode === newMode) return;
+  if (currentMode === 'screensaver')  exitScreensaver();
+  if (currentMode === 'after-hours')  exitAfterHours();
+  currentMode = newMode;
+  if (newMode === 'screensaver')  enterScreensaver();
+  if (newMode === 'after-hours')  enterAfterHours(myCards);
+}
+
+// ── SCREENSAVER MODULE ───────────────────────────────────
+function initScreensaver() {
+  const canvas = document.getElementById('ssCanvas');
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 28; i++) ssParticles.push(makeParticle(canvas));
+}
+
+function makeParticle(canvas) {
+  return {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.4 + 0.3,
+    speed: Math.random() * 0.18 + 0.04,
+    angle: Math.random() * Math.PI * 2,
+    wobble: (Math.random() - 0.5) * 0.012,
+    opacity: Math.random() * 0.18 + 0.03,
+  };
+}
+
+function drawScreensaver() {
+  const overlay = document.getElementById('screensaverOverlay');
+  if (!overlay.classList.contains('active')) { ssAnimFrame = null; return; }
+
+  const canvas = document.getElementById('ssCanvas');
+  const ctx    = canvas.getContext('2d');
+  const w = canvas.width; const h = canvas.height;
+
+  // Dark background + slow red center pulse
+  ctx.fillStyle = '#0d0d0d';
+  ctx.fillRect(0, 0, w, h);
+  const pulse = (Math.sin(Date.now() / 5000) + 1) / 2 * 0.04 + 0.01;
+  const grad  = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w * 0.55);
+  grad.addColorStop(0, `rgba(185,28,28,${pulse})`);
+  grad.addColorStop(1, 'rgba(185,28,28,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Particles
+  for (const p of ssParticles) {
+    p.angle += p.wobble;
+    p.x += Math.cos(p.angle) * p.speed;
+    p.y += Math.sin(p.angle) * p.speed;
+    if (p.x < -15 || p.x > w + 15 || p.y < -15 || p.y > h + 15) {
+      Object.assign(p, makeParticle(canvas));
+    }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(185,28,28,${p.opacity})`;
+    ctx.fill();
+  }
+
+  // Update clock once per second
+  const sec = new Date().getSeconds();
+  if (sec !== ssLastSecond) { ssLastSecond = sec; updateScreensaverClock(); }
+
+  ssAnimFrame = requestAnimationFrame(drawScreensaver);
+}
+
+function updateScreensaverClock() {
+  const now   = new Date();
+  const h12   = now.getHours() % 12 || 12;
+  const mins  = String(now.getMinutes()).padStart(2, '0');
+  const ampm  = now.getHours() >= 12 ? 'PM' : 'AM';
+  const date  = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('ssClock').textContent = `${String(h12).padStart(2,'0')}:${mins}`;
+  document.getElementById('ssAmpm').textContent  = ampm;
+  document.getElementById('ssDate').textContent  = date;
+}
+
+function updateScreensaverWeather() {
+  if (!weatherCache) return;
+  const code = weatherCache.current.weathercode;
+  const temp = Math.round(weatherCache.current.temperature_2m);
+  document.getElementById('ssWeatherIcon').textContent = WEATHER_ICONS[code] || '🌤';
+  document.getElementById('ssWeatherTemp').textContent = `${temp}°F`;
+  document.getElementById('ssWeatherDesc').textContent = weatherDesc(code);
+}
+
+function enterScreensaver() {
+  if (!appSettings.idleScreensaver?.enabled) { currentMode = 'normal'; return; }
+  updateScreensaverClock();
+  updateScreensaverWeather();
+  document.getElementById('screensaverOverlay').classList.add('active');
+  if (!ssAnimFrame) ssAnimFrame = requestAnimationFrame(drawScreensaver);
+}
+
+function exitScreensaver() {
+  document.getElementById('screensaverOverlay').classList.remove('active');
+  // Animation loop self-stops when overlay loses .active
+}
+
+// ── AFTER HOURS MODULE ───────────────────────────────────
+function getNextOpenTime() {
+  const now  = new Date();
+  const open = new Date(now);
+  open.setSeconds(0, 0);
+  const day = now.getDay();
+  const h   = now.getHours(); const m = now.getMinutes();
+  const beforeOpen = h < OPEN_HOUR || (h === OPEN_HOUR && m < OPEN_MIN);
+
+  if (day === 0) {
+    open.setDate(open.getDate() + 1); // Sunday → Monday
+  } else if (beforeOpen) {
+    // Opens today
+  } else {
+    open.setDate(open.getDate() + 1); // Tomorrow
+    if (open.getDay() === 0) open.setDate(open.getDate() + 1); // Skip Sunday
+  }
+  open.setHours(OPEN_HOUR, OPEN_MIN, 0, 0);
+  return open;
+}
+
+function formatCountdown() {
+  const diff = getNextOpenTime() - Date.now();
+  if (diff <= 0) return 'Opening now';
+  const hrs  = Math.floor(diff / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  if (hrs === 0) return `Opens in ${mins}m`;
+  return `Opens in ${hrs}h ${mins}m`;
+}
+
+function updateAfterHoursClock() {
+  const now  = new Date();
+  const h12  = now.getHours() % 12 || 12;
+  const mins = String(now.getMinutes()).padStart(2, '0');
+  const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+  const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const clockEl = document.getElementById('ahClock');
+  const dateEl  = document.getElementById('ahClockDate');
+  const cntEl   = document.getElementById('ahCountdown');
+  if (clockEl) clockEl.textContent = `${h12}:${mins} ${ampm}`;
+  if (dateEl)  dateEl.textContent  = date;
+  if (cntEl)   cntEl.textContent   = formatCountdown();
+}
+
+function updateAfterHoursWeather() {
+  if (!weatherCache) return;
+  const now  = new Date();
+  const isBeforeOpen = now.getHours() < OPEN_HOUR || (now.getHours() === OPEN_HOUR && now.getMinutes() < OPEN_MIN);
+  const idx  = isBeforeOpen ? 0 : 1; // today's forecast if morning, tomorrow's if evening
+  const high = Math.round(weatherCache.daily.temperature_2m_max[idx]);
+  const low  = Math.round(weatherCache.daily.temperature_2m_min[idx]);
+  const code = weatherCache.daily.weathercode[idx];
+  const rain = weatherCache.daily.precipitation_probability_max[idx] || 0;
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const fDate = new Date(); fDate.setDate(fDate.getDate() + idx);
+  const label = idx === 0 ? 'Today' : days[fDate.getDay()];
+
+  const title = document.querySelector('.ah-weather-title');
+  if (title) title.textContent = `${label}'s Forecast`;
+  const iconEl  = document.querySelector('#ahWeatherRow .ah-weather-icon');
+  const tempsEl = document.getElementById('ahWeatherTemps');
+  const descEl  = document.getElementById('ahWeatherDesc');
+  const rainEl  = document.getElementById('ahWeatherRain');
+  if (iconEl)  iconEl.textContent  = WEATHER_ICONS[code] || '🌤';
+  if (tempsEl) tempsEl.textContent = `${high}° / ${low}°`;
+  if (descEl)  descEl.textContent  = weatherDesc(code);
+  if (rainEl)  rainEl.textContent  = rain > 20 ? `💧 ${rain}%` : '';
+}
+
+async function loadOvernightSummary(myCards) {
+  if (ahSummaryFetchedAt && Date.now() - ahSummaryFetchedAt < 30 * 60 * 1000) return;
+  ahSummaryFetchedAt = Date.now();
+
+  const el = document.getElementById('ahSummaryText');
+  if (!el) return;
+  el.textContent = 'Analyzing board...';
+
+  const comm    = myCards.filter(c => isCommercial(c.name, c.desc)).length;
+  const overdue = myCards.filter(c => daysOld(c.dateLastActivity) > 7).length;
+  const now     = new Date();
+  const isEve   = now.getHours() >= CLOSE_HOUR;
+
+  const prompt = isEve
+    ? `Overnight assistant for Kelton, tech at Lawnsmith Plus Deridder LA (outdoor power equipment).\nShop just closed. Queue: ${myCards.length} jobs carrying over. ${comm} commercial, ${overdue} overdue (7+ days).\nJobs: ${myCards.map(c=>`"${c.name}"`).join(', ')||'none'}.\n2-3 sentence overnight watch. What to prioritize first thing tomorrow. Calm, professional.`
+    : `Morning pre-open assistant for Kelton at Lawnsmith Plus Deridder LA.\nQueue: ${myCards.length} jobs waiting. ${comm} commercial, ${overdue} overdue.\nJobs: ${myCards.map(c=>`"${c.name}"`).join(', ')||'none'}.\n2-3 sentence "what's waiting when you open" summary. Practical, calm.`;
+
+  const summary = await claude(prompt, 300);
+  if (el) el.textContent = summary || 'Board is being monitored. Check back when you open.';
+}
+
+function enterAfterHours(myCards) {
+  if (!appSettings.afterHours?.enabled) { currentMode = 'normal'; return; }
+  updateAfterHoursClock();
+  updateAfterHoursWeather();
+  document.getElementById('afterHoursOverlay').classList.add('active');
+  if (ahClockTick) clearInterval(ahClockTick);
+  ahClockTick = setInterval(updateAfterHoursClock, 15000);
+  if (myCards) loadOvernightSummary(myCards);
+}
+
+function exitAfterHours() {
+  document.getElementById('afterHoursOverlay').classList.remove('active');
+  if (ahClockTick) { clearInterval(ahClockTick); ahClockTick = null; }
+  ahSummaryFetchedAt = null; // reset so it refreshes next time
+}
+
+// ── INIT ─────────────────────────────────────────────────
+(async function init() {
+  await loadSettings();
+  initScreensaver();
+
+  // User activity listeners — resets idle timer & wakes screensaver
+  ['mousemove','keydown','click','touchstart'].forEach(evt =>
+    document.addEventListener(evt, recordUserActivity, { passive: true })
+  );
+
+  // Escape exits any active overlay back to normal board
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (currentMode === 'screensaver' || currentMode === 'after-hours') switchMode('normal');
+    }
+    if (e.ctrlKey && e.shiftKey) {
+      if (e.key === 'S') { e.preventDefault(); switchMode('screensaver'); }
+      if (e.key === 'A') { e.preventDefault(); switchMode('after-hours'); }
+      if (e.key === 'N') { e.preventDefault(); switchMode('normal'); }
+    }
+  });
+
+  document.getElementById('ahReturnBtn')?.addEventListener('click', () => switchMode('normal'));
+
+  refresh();
+  loadWeather();
+  refreshIntervalId = setInterval(refresh, REFRESH_MS);
+  setInterval(loadWeather, WEATHER_REFRESH_MS);
+
+  // Mode evaluation runs every 60s independently of refresh
+  setInterval(() => {
+    if (!document.getElementById('eodOverlay').classList.contains('visible')) {
+      evaluateMode(null);
+    }
+  }, 60000);
+
+  // Mention polling starts after board setup settles
+  setTimeout(() => { checkMentions(); mentionIntervalId = setInterval(checkMentions, REFRESH_MS); }, 8000);
+
+  initOfflineDetection();
+  initUpdateListeners();
+  initSettingsPanel();
+})();
+
+// ── OFFLINE DETECTION ────────────────────────────────────
+function initOfflineDetection() {
+  window.addEventListener('offline', goOffline);
+  window.addEventListener('online',  () => { if (isOffline) tryReconnect(); });
+  if (!navigator.onLine) goOffline();
+}
+
+function goOffline() {
+  if (isOffline) return;
+  isOffline   = true;
+  offlineStart = Date.now();
+  document.getElementById('offlineBanner').classList.add('visible');
+  updateOfflineElapsed();
+  if (offlineRetryId) clearInterval(offlineRetryId);
+  offlineRetryId = setInterval(tryReconnect, 30000);
+}
+
+function goOnline() {
+  if (!isOffline) return;
+  isOffline = false;
+  document.getElementById('offlineBanner').classList.remove('visible');
+  if (offlineRetryId) { clearInterval(offlineRetryId); offlineRetryId = null; }
+  const toast = document.createElement('div');
+  toast.className = 'back-online-toast';
+  toast.textContent = '✓ Back online';
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => { setTimeout(() => toast.classList.add('show'), 10); });
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 350); }, 3000);
+  refresh();
+}
+
+function updateOfflineElapsed() {
+  if (!isOffline) return;
+  const el = document.getElementById('offlineElapsed');
+  if (el && offlineStart) {
+    const s = Math.floor((Date.now() - offlineStart) / 1000);
+    el.textContent = s < 60 ? `${s}s` : `${Math.floor(s / 60)}m`;
+  }
+  setTimeout(updateOfflineElapsed, 10000);
+}
+
+async function tryReconnect() {
+  try {
+    await fetch(`https://api.trello.com/1/members/me?key=${TRELLO_KEY}&token=${TRELLO_TOKEN}&fields=username`, { signal: AbortSignal.timeout(8000) });
+    goOnline();
+  } catch {}
+}
+
+// ── UPDATE NOTIFICATION ──────────────────────────────────
+function initUpdateListeners() {
+  if (!window.electronAPI) return;
+  window.electronAPI.onUpdateReady?.(info => {
+    document.getElementById('updateToastVer').textContent = `Version ${info.version} is ready`;
+    document.getElementById('updateToast').classList.add('visible');
+  });
+  document.getElementById('updateInstallBtn')?.addEventListener('click', () => {
+    window.electronAPI.installUpdate?.();
+  });
+  document.getElementById('updateDismissBtn')?.addEventListener('click', () => {
+    document.getElementById('updateToast').classList.remove('visible');
+  });
+}
+
+// ── SETTINGS PANEL ───────────────────────────────────────
+function initSettingsPanel() {
+  document.getElementById('settingsGearBtn')?.addEventListener('click', openSettings);
+  document.getElementById('settingsCloseBtn')?.addEventListener('click', closeSettings);
+  document.getElementById('settingsCancelBtn')?.addEventListener('click', closeSettings);
+  document.getElementById('settingsSaveBtn')?.addEventListener('click', saveSettings);
+  document.getElementById('settingsViewLogsBtn')?.addEventListener('click', () => {
+    window.electronAPI?.openLog?.();
+  });
+  const volSlider = document.getElementById('set-volume');
+  volSlider?.addEventListener('input', () => {
+    document.getElementById('set-volume-val').textContent = volSlider.value;
+  });
+  document.getElementById('settingsOverlay')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('settingsOverlay')) closeSettings();
+  });
+}
+
+function openSettings() {
+  populateSettingsForm();
+  document.getElementById('settingsOverlay').classList.add('visible');
+  document.getElementById('settingsSaveOk').classList.remove('show');
+}
+
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('visible');
+}
+
+function populateSettingsForm() {
+  const s = appSettings;
+  document.getElementById('set-trello-key').value     = s.trello?.key     || TRELLO_KEY;
+  document.getElementById('set-trello-token').value   = s.trello?.token   || TRELLO_TOKEN;
+  document.getElementById('set-board-name').value     = s.trello?.boardName || BOARD_NAME;
+  document.getElementById('set-list-name').value      = s.trello?.listName  || LIST_NAME;
+  document.getElementById('set-anthropic-key').value  = s.anthropic?.key  || ANTHROPIC_KEY;
+  document.getElementById('set-coworkers').value      = (s.quoteCoworkers || ['Preston','Trey']).join(', ');
+  document.getElementById('set-approval-sound').checked = s.notifications?.approvalSound !== false;
+  document.getElementById('set-newcard-sound').checked  = s.notifications?.newCardSound  !== false;
+  const vol = Math.round((s.notifications?.volume ?? 0.8) * 100);
+  document.getElementById('set-volume').value    = vol;
+  document.getElementById('set-volume-val').textContent = vol;
+  document.getElementById('set-qj-enabled').checked = s.quickJobs?.enabled !== false;
+  document.getElementById('set-qj-hour').value       = s.quickJobs?.overdueHour ?? 8;
+  document.getElementById('set-qj-sound').checked    = s.quickJobs?.overdueSound !== false;
+  document.getElementById('set-refresh').value        = s.refreshInterval ?? 45;
+  document.getElementById('set-screensaver').checked  = s.idleScreensaver?.enabled !== false;
+  document.getElementById('set-idle-mins').value      = s.idleScreensaver?.idleMinutes ?? 30;
+  document.getElementById('set-afterhours').checked   = s.afterHours?.enabled !== false;
+  document.getElementById('set-closed-sunday').checked = s.afterHours?.closedSunday !== false;
+  document.getElementById('set-lat').value            = s.weather?.lat ?? LAT;
+  document.getElementById('set-lon').value            = s.weather?.lon ?? LON;
+  document.getElementById('set-mention-user').value   = s.mention?.username ?? MENTION_USERNAME;
+}
+
+async function saveSettings() {
+  const newSettings = {
+    trello: {
+      key:       document.getElementById('set-trello-key').value.trim(),
+      token:     document.getElementById('set-trello-token').value.trim(),
+      boardName: document.getElementById('set-board-name').value.trim(),
+      listName:  document.getElementById('set-list-name').value.trim(),
+    },
+    anthropic: {
+      key: document.getElementById('set-anthropic-key').value.trim(),
+    },
+    quoteCoworkers: document.getElementById('set-coworkers').value.split(',').map(s => s.trim()).filter(Boolean),
+    notifications: {
+      approvalSound: document.getElementById('set-approval-sound').checked,
+      newCardSound:  document.getElementById('set-newcard-sound').checked,
+      volume:        parseInt(document.getElementById('set-volume').value) / 100,
+    },
+    quickJobs: {
+      enabled:     document.getElementById('set-qj-enabled').checked,
+      overdueHour: parseInt(document.getElementById('set-qj-hour').value),
+      overdueSound: document.getElementById('set-qj-sound').checked,
+    },
+    refreshInterval: parseInt(document.getElementById('set-refresh').value) || 45,
+    idleScreensaver: {
+      enabled:     document.getElementById('set-screensaver').checked,
+      idleMinutes: parseInt(document.getElementById('set-idle-mins').value) || 30,
+    },
+    afterHours: {
+      enabled:       document.getElementById('set-afterhours').checked,
+      closedSunday:  document.getElementById('set-closed-sunday').checked,
+    },
+    weather: {
+      lat: parseFloat(document.getElementById('set-lat').value),
+      lon: parseFloat(document.getElementById('set-lon').value),
+    },
+    mention: {
+      username: document.getElementById('set-mention-user').value.trim(),
+    },
+    launchOnStartup: appSettings.launchOnStartup ?? false,
+  };
+
+  appSettings = newSettings;
+  applySettingsToConfig(newSettings);
+  await window.electronAPI?.writeSettings?.(newSettings);
+
+  // Apply live: restart refresh loop if interval changed
+  if (refreshIntervalId) { clearInterval(refreshIntervalId); refreshIntervalId = setInterval(refresh, REFRESH_MS); }
+  if (mentionIntervalId) { clearInterval(mentionIntervalId); mentionIntervalId = setInterval(checkMentions, REFRESH_MS); }
+
+  // Re-init board with potentially new keys/list name
+  boardId = null; listId = null; allLists = [];
+  isFirstLoad = true;
+  refresh();
+  loadWeather();
+  refreshQuotes();
+
+  const ok = document.getElementById('settingsSaveOk');
+  ok.classList.add('show');
+  setTimeout(() => ok.classList.remove('show'), 2500);
+}
+</script>
+
+<!-- Update toast -->
+<div class="update-toast" id="updateToast">
+  <div class="update-toast-body">
+    <span class="update-toast-icon">⬆️</span>
+    <div class="update-toast-info">
+      <div class="update-toast-title">Update ready to install</div>
+      <div class="update-toast-ver" id="updateToastVer"></div>
+    </div>
+    <button class="update-toast-install" id="updateInstallBtn">Restart now</button>
+    <button class="update-toast-dismiss" id="updateDismissBtn">✕</button>
+  </div>
+</div>
+
+<!-- Settings overlay -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-panel">
+    <div class="settings-hdr">
+      <span class="settings-hdr-title">⚙ Settings</span>
+      <button class="settings-hdr-close" id="settingsCloseBtn">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <div class="settings-section">
+        <div class="settings-section-title">Trello</div>
+        <div class="settings-row"><label>API Key</label><input type="password" id="set-trello-key" class="settings-input"></div>
+        <div class="settings-row"><label>API Token</label><input type="password" id="set-trello-token" class="settings-input"></div>
+        <div class="settings-row"><label>Board Name</label><input type="text" id="set-board-name" class="settings-input"></div>
+        <div class="settings-row"><label>My List Name</label><input type="text" id="set-list-name" class="settings-input"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Claude AI</div>
+        <div class="settings-row"><label>Anthropic API Key</label><input type="password" id="set-anthropic-key" class="settings-input"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Pending Quotes</div>
+        <div class="settings-row"><label>Coworker names (comma-separated)</label><input type="text" id="set-coworkers" class="settings-input"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Notifications</div>
+        <div class="settings-row"><label>Approval sound</label><input type="checkbox" id="set-approval-sound" class="settings-toggle"></div>
+        <div class="settings-row"><label>New card sound</label><input type="checkbox" id="set-newcard-sound" class="settings-toggle"></div>
+        <div class="settings-row"><label>Master volume</label><input type="range" id="set-volume" class="settings-slider" min="0" max="100"><span id="set-volume-val" class="settings-slider-val">80</span></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Quick Jobs</div>
+        <div class="settings-row"><label>Enabled</label><input type="checkbox" id="set-qj-enabled" class="settings-toggle"></div>
+        <div class="settings-row"><label>Overdue threshold hour (0–23)</label><input type="number" id="set-qj-hour" class="settings-input settings-input-sm" min="0" max="23"></div>
+        <div class="settings-row"><label>Overdue sound</label><input type="checkbox" id="set-qj-sound" class="settings-toggle"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Display</div>
+        <div class="settings-row"><label>Refresh interval (seconds)</label><input type="number" id="set-refresh" class="settings-input settings-input-sm" min="15" max="300"></div>
+        <div class="settings-row"><label>Idle screensaver</label><input type="checkbox" id="set-screensaver" class="settings-toggle"></div>
+        <div class="settings-row"><label>Screensaver idle timeout (minutes)</label><input type="number" id="set-idle-mins" class="settings-input settings-input-sm" min="5" max="120"></div>
+        <div class="settings-row"><label>After-hours mode</label><input type="checkbox" id="set-afterhours" class="settings-toggle"></div>
+        <div class="settings-row"><label>Closed on Sundays</label><input type="checkbox" id="set-closed-sunday" class="settings-toggle"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Weather</div>
+        <div class="settings-row"><label>Latitude</label><input type="number" id="set-lat" class="settings-input settings-input-sm" step="0.0001"></div>
+        <div class="settings-row"><label>Longitude</label><input type="number" id="set-lon" class="settings-input settings-input-sm" step="0.0001"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Mention Handle</div>
+        <div class="settings-row"><label>Trello username (no @)</label><input type="text" id="set-mention-user" class="settings-input settings-input-sm"></div>
+      </div>
+
+    </div>
+    <div class="settings-ftr">
+      <button class="settings-btn settings-btn-logs" id="settingsViewLogsBtn">📄 View Logs</button>
+      <span class="settings-save-ok" id="settingsSaveOk">✓ Saved</span>
+      <div class="settings-ftr-right">
+        <button class="settings-btn settings-btn-cancel" id="settingsCancelBtn">Cancel</button>
+        <button class="settings-btn settings-btn-save" id="settingsSaveBtn">Save &amp; Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
