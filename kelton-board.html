@@ -456,8 +456,19 @@
 
   /* Divider line */
   .ah-divider { grid-column: 1 / -1; grid-row: 4; height: 1px; background: var(--border); opacity: 0.5; align-self: end; }
-  .ah-return-btn { margin-top: 22px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: var(--muted); font-size: 11px; font-family: inherit; letter-spacing: 0.5px; padding: 7px 20px; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
-  .ah-return-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+  /* Return button — fixed bottom center, outside the grid */
+  .ah-return-btn {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.25);
+    font-size: 11px; font-family: inherit; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 8px 24px; border-radius: 20px; cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+  .ah-return-btn:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.6); }
 </style>
 </head>
 <body>
@@ -655,7 +666,6 @@
 // ── CONFIG ──────────────────────────────────────────────
 let TRELLO_KEY    = '';
 let TRELLO_TOKEN  = '';
-let ANTHROPIC_KEY = '';
 let BOARD_NAME    = 'Lawnsmith Plus';
 let LIST_NAME     = 'Kelton';
 let REFRESH_MS    = 45000;
@@ -705,13 +715,9 @@ let ahSummaryFetchedAt = null;
 
 // Quotes state
 let quoteListIds   = {};    // { coworkerName: listId }
-let quotesAiFetchedAt = null;
-let quotesAiStaleKey  = ''; // tracks which stale customers the AI note covers
 
 // Quick Jobs state
 let qjOverdueSeen = new Set();  // card IDs that have already fired the overdue sound
-let qjAIFetchedAt = null;
-let qjAIForIds    = '';         // which overdue IDs the current AI message covers
 
 // ── HELPERS ─────────────────────────────────────────────
 function trello(path) {
@@ -721,17 +727,6 @@ function trello(path) {
     .catch(err => { if (err instanceof TypeError) goOffline(); throw err; });
 }
 
-async function claude(prompt, maxTokens = 1000) {
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
-    });
-    const data = await res.json();
-    return data.content?.[0]?.text?.trim() ?? null;
-  } catch(e) { console.error('Claude error:', e); return null; }
-}
 
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -796,11 +791,22 @@ async function loadWeather() {
       fSum.push(`${dn}: ${Math.round(data.daily.temperature_2m_max[i])}°/${Math.round(data.daily.temperature_2m_min[i])}° ${weatherDesc(data.daily.weathercode[i])}, ${data.daily.precipitation_probability_max[i]||0}% rain`);
     }
 
-    const analysis = await claude(
-      `You are a weather analyst for Lawnsmith Plus, an outdoor power equipment shop in Deridder Louisiana. The shop sells and repairs lawnmowers, trimmers, chainsaws, blowers, and generators.\n7-day forecast: ${fSum.join(' | ')}\n\nWrite a 2-3 sentence weather analysis for the shop. Focus on: rain days (drive repair surges 1-2 days after), hot dry stretches (commercial mower breakdowns), storms (chainsaw/generator demand), cold snaps (carb/fuel issues). Be direct, mention specific days. No fluff. Don't start with "Looking ahead".`,
-      400
-    );
-    document.getElementById('weatherAnalysis').textContent = analysis || 'Weather analysis temporarily unavailable.';
+    const rainDays = [], hotDays = [], stormDays = [];
+    for (let i = 0; i < Math.min(7, data.daily.weathercode.length); i++) {
+      const dn   = i === 0 ? 'Today' : days[(today + i) % 7];
+      const code = data.daily.weathercode[i];
+      const rain = data.daily.precipitation_probability_max[i] || 0;
+      const tmax = Math.round(data.daily.temperature_2m_max[i]);
+      if (code >= 61 || rain >= 50) rainDays.push(dn);
+      if (tmax >= 95) hotDays.push(dn);
+      if (code >= 80) stormDays.push(dn);
+    }
+    const analysisParts = [];
+    if (rainDays.length) analysisParts.push(`Rain expected ${rainDays.join(', ')} — expect a repair surge shortly after.`);
+    if (stormDays.length) analysisParts.push(`Storms ${stormDays.join(', ')} — chainsaw and generator demand likely.`);
+    if (hotDays.length) analysisParts.push(`Extreme heat ${hotDays.join(', ')} — watch for commercial mower breakdowns.`);
+    if (!analysisParts.length) analysisParts.push('No major weather events this week — steady repair traffic expected.');
+    document.getElementById('weatherAnalysis').textContent = analysisParts.join(' ');
 
     // Update secondary displays if active
     updateScreensaverWeather();
@@ -846,37 +852,35 @@ function priorityScore(card, allCards) {
   return Math.min(10, Math.max(1, score));
 }
 
-// ── AI INSIGHT ──────────────────────────────────────────
-async function loadInsight(card, allCards) {
+// ── CARD INSIGHT ─────────────────────────────────────────
+function loadInsight(card, allCards) {
   const el = document.getElementById(`ai-${card.id}`);
   if (!el) return;
   const related = findRelated(card, allCards);
   const age = daysOld(card.dateLastActivity);
-  const ctx = [];
-  if (related.length) ctx.push(`Related cards: ${related.slice(0,5).map(r=>`"${r.title}" in ${r.list}`).join(', ')}`);
-  if (age > 7) ctx.push(`Over a week old`); else if (age > 3) ctx.push(`${Math.floor(age)} days old`);
-  if (isCommercial(card.name, card.desc)) ctx.push(`Commercial customer — high priority`);
-  if (countNameOccurrences(card, allCards) > 1) ctx.push(`Appears multiple times on the board`);
-  if (isComplex(card.name, card.desc)) ctx.push(`Complex job`);
-  const prompt = ctx.length
-    ? `Shop assistant for Kelton at Lawnsmith Plus Deridder LA. Card: "${card.name}"${card.desc?`\nNotes: ${card.desc}`:''}\nContext: ${ctx.join('. ')}\nONE punchy sentence (max 14 words). Direct. No quotes. No openers like "Note that".`
-    : `Shop assistant for Kelton at Lawnsmith Plus. Card: "${card.name}"${card.desc?`\nNotes: ${card.desc}`:''}\nONE useful sentence (max 14 words) — tip, what to check first, or what to grab. Direct.`;
-  const insight = await claude(prompt, 200);
-  const cur = document.getElementById(`ai-${card.id}`);
-  if (!insight || !cur) { if (cur) cur.remove(); return; }
-  cur.outerHTML = `<div class="ai-insight"><span class="ai-icon">💡</span><span class="ai-text">${insight}</span></div>`;
+  const tips = [];
+  if (isCommercial(card.name, card.desc)) tips.push('Commercial job — prioritize.');
+  if (age > 10) tips.push(`${Math.floor(age)} days old — follow up today.`);
+  else if (age > 5) tips.push(`${Math.floor(age)} days in shop — check status.`);
+  if (countNameOccurrences(card, allCards) > 1) tips.push('Customer has multiple jobs on board.');
+  if (related.length) tips.push(`Related: ${related[0].title} in ${related[0].list}.`);
+  if (isComplex(card.name, card.desc)) tips.push('Complex job — allow extra time.');
+  if (!tips.length) { el.remove(); return; }
+  el.outerHTML = `<div class="ai-insight"><span class="ai-icon">💡</span><span class="ai-text">${tips[0]}</span></div>`;
 }
 
 // ── BRIEFING ────────────────────────────────────────────
-async function loadBriefing(myCards) {
+function loadBriefing(myCards) {
   document.getElementById('briefingBar').classList.add('visible');
   const comm   = myCards.filter(c => isCommercial(c.name, c.desc)).length;
   const oldest = myCards.length ? myCards.reduce((a,b) => daysOld(a.dateLastActivity) > daysOld(b.dateLastActivity) ? a : b) : null;
-  const text   = await claude(
-    `AI assistant for Kelton, outdoor power equipment tech at Lawnsmith Plus Deridder LA. Starting shift.\nQueue: ${myCards.length} jobs. ${comm} commercial.${oldest?`\nOldest: "${oldest.name}" (${Math.floor(daysOld(oldest.dateLastActivity))} days old).`:''}\nCards: ${myCards.map(c=>`"${c.name}"`).join(', ')||'none'}.\n2-3 sentence briefing. What to prioritize. Be direct and practical.`,
-    300
-  );
-  document.getElementById('briefingText').textContent = text || 'Have a great day!';
+  const parts  = [`${myCards.length} job${myCards.length !== 1 ? 's' : ''} in the queue.`];
+  if (comm) parts.push(`${comm} commercial — prioritize those first.`);
+  if (oldest) {
+    const d = Math.floor(daysOld(oldest.dateLastActivity));
+    if (d > 5) parts.push(`Oldest: "${oldest.name}" — ${d} days, needs attention.`);
+  }
+  document.getElementById('briefingText').textContent = parts.join(' ') || 'Have a great day!';
 }
 
 // ── EOD ─────────────────────────────────────────────────
@@ -891,11 +895,17 @@ async function showEOD(myCards) {
   const comm = myCards.filter(c => isCommercial(c.name, c.desc)).length;
   document.getElementById('eodActive').textContent     = myCards.length;
   document.getElementById('eodCommercial').textContent = comm;
-  const summary = await claude(
-    `AI assistant for Kelton at Lawnsmith Plus. End of day 5:30pm.\nRemaining: ${myCards.length} jobs. Commercial: ${comm}.\nOpen: ${myCards.map(c=>`"${c.name}"`).join(', ')||'none'}.\n3-4 sentence end of day wrap-up. Note carry-overs, urgent commercial work, brief encouraging note.`,
-    400
-  );
-  document.getElementById('eodSummary').textContent = summary || 'Have a great evening, Kelton!';
+  const eodParts = [];
+  if (myCards.length === 0) {
+    eodParts.push('All clear — nothing carrying over tonight. Great work today!');
+  } else {
+    eodParts.push(`${myCards.length} job${myCards.length !== 1 ? 's' : ''} carrying over.`);
+    if (comm) eodParts.push(`${comm} commercial — make sure those are noted for tomorrow.`);
+    const overdue = myCards.filter(c => daysOld(c.dateLastActivity) > 5);
+    if (overdue.length) eodParts.push(`${overdue.length} job${overdue.length !== 1 ? 's' : ''} over 5 days old — follow up first thing.`);
+    eodParts.push('Have a good evening, Kelton!');
+  }
+  document.getElementById('eodSummary').textContent = eodParts.join(' ');
   document.getElementById('eodDismissBtn').addEventListener('click', () => {
     document.getElementById('eodOverlay').classList.remove('visible');
     document.getElementById('boardWrapper').style.display = '';
@@ -1310,23 +1320,15 @@ async function refreshQuotes() {
     const aiEl     = document.getElementById('quotesAI');
     const staleKey = stale.map(q => q.id).join(',');
 
-    if (stale.length && (staleKey !== quotesAiStaleKey || !quotesAiFetchedAt || Date.now() - quotesAiFetchedAt > 30 * 60 * 1000)) {
-      quotesAiFetchedAt = Date.now();
-      quotesAiStaleKey  = staleKey;
-      const list = stale.map(q => `${q.customer} with ${q.coworker} (${Math.floor(q.ageDays)}d)`).join(', ');
-      const note = await claude(
-        `Shop assistant for Kelton at Lawnsmith Plus. Stale pending quotes (waiting on a price approval): ${list}.\nWrite ONE direct follow-up reminder, max 18 words. Lead with the longest-waiting customer. No opener words.`,
-        120
-      );
-      if (aiEl && note) {
-        aiEl.innerHTML = `<span class="quotes-ai-icon">💡</span><span class="quotes-ai-text">${escapeHtml(note)}</span>`;
-        aiEl.classList.add('visible');
-      }
+    if (stale.length && aiEl) {
+      const top  = stale[0];
+      const days = Math.floor(top.ageDays);
+      const note = `Follow up on ${top.customer} with ${top.coworker} — waiting ${days} day${days !== 1 ? 's' : ''}.`;
+      aiEl.innerHTML = `<span class="quotes-ai-icon">💡</span><span class="quotes-ai-text">${escapeHtml(note)}</span>`;
+      aiEl.classList.add('visible');
     } else if (!stale.length && aiEl) {
       aiEl.innerHTML = '';
       aiEl.classList.remove('visible');
-      quotesAiFetchedAt = null;
-      quotesAiStaleKey  = '';
     }
 
   } catch(e) {
@@ -1413,22 +1415,13 @@ function playOverdueSound(vol) {
   ], 0.34, vol);
 }
 
-async function loadQJOverdueAI(overdueJobs) {
-  const ids = overdueJobs.map(j => j.id).join(',');
-  if (ids === qjAIForIds && qjAIFetchedAt && Date.now() - qjAIFetchedAt < 20 * 60 * 1000) return;
-  qjAIForIds    = ids;
-  qjAIFetchedAt = Date.now();
-
-  const list = overdueJobs.map(j => `${j.customer} (${qjDeadlineLabel(j.deadline, true)})`).join(', ');
-  const note = await claude(
-    `Shop assistant for Kelton at Lawnsmith Plus. Overdue quick jobs still on the board: ${list}.\nWrite ONE urgent heads-up sentence (max 18 words). Name the most overdue job first. No opener words.`,
-    100
-  );
+function loadQJOverdueNote(overdueJobs) {
   const aiEl = document.getElementById('qjAI');
-  if (aiEl && note) {
-    aiEl.innerHTML = `<span class="qj-ai-icon">⚠️</span><span class="qj-ai-text">${escapeHtml(note)}</span>`;
-    aiEl.classList.add('visible');
-  }
+  if (!aiEl) return;
+  const top  = overdueJobs[0];
+  const note = `${top.customer} (${qjDeadlineLabel(top.deadline, true)}) — finish or call now.${overdueJobs.length > 1 ? ` +${overdueJobs.length - 1} more overdue.` : ''}`;
+  aiEl.innerHTML = `<span class="qj-ai-icon">⚠️</span><span class="qj-ai-text">${escapeHtml(note)}</span>`;
+  aiEl.classList.add('visible');
 }
 
 function renderQuickJobs(rawCards) {
@@ -1518,14 +1511,11 @@ function renderQuickJobs(rawCards) {
     }
   }
 
-  // AI overdue message (async, non-blocking)
   if (overdueJobs.length) {
-    loadQJOverdueAI(overdueJobs);
+    loadQJOverdueNote(overdueJobs);
   } else if (aiEl) {
     aiEl.innerHTML = '';
     aiEl.classList.remove('visible');
-    qjAIFetchedAt = null;
-    qjAIForIds    = '';
   }
 }
 
@@ -1545,7 +1535,6 @@ function applySettingsToConfig(s) {
   if (s.trello?.token)      TRELLO_TOKEN = s.trello.token;
   if (s.trello?.boardName)  BOARD_NAME   = s.trello.boardName;
   if (s.trello?.listName)   LIST_NAME    = s.trello.listName;
-  if (s.anthropic?.key)     ANTHROPIC_KEY = s.anthropic.key;
   if (s.weather?.lat != null) LAT = s.weather.lat;
   if (s.weather?.lon != null) LON = s.weather.lon;
   if (s.mention?.username)  MENTION_USERNAME = s.mention.username;
@@ -1768,25 +1757,28 @@ function updateAfterHoursWeather() {
   if (rainEl)  rainEl.textContent  = rain > 20 ? `💧 ${rain}%` : '';
 }
 
-async function loadOvernightSummary(myCards) {
+function loadOvernightSummary(myCards) {
   if (ahSummaryFetchedAt && Date.now() - ahSummaryFetchedAt < 30 * 60 * 1000) return;
   ahSummaryFetchedAt = Date.now();
 
   const el = document.getElementById('ahSummaryText');
   if (!el) return;
-  el.textContent = 'Analyzing board...';
 
   const comm    = myCards.filter(c => isCommercial(c.name, c.desc)).length;
   const overdue = myCards.filter(c => daysOld(c.dateLastActivity) > 7).length;
-  const now     = new Date();
-  const isEve   = now.getHours() >= CLOSE_HOUR;
+  const isEve   = new Date().getHours() >= CLOSE_HOUR;
 
-  const prompt = isEve
-    ? `Overnight assistant for Kelton, tech at Lawnsmith Plus Deridder LA (outdoor power equipment).\nShop just closed. Queue: ${myCards.length} jobs carrying over. ${comm} commercial, ${overdue} overdue (7+ days).\nJobs: ${myCards.map(c=>`"${c.name}"`).join(', ')||'none'}.\n2-3 sentence overnight watch. What to prioritize first thing tomorrow. Calm, professional.`
-    : `Morning pre-open assistant for Kelton at Lawnsmith Plus Deridder LA.\nQueue: ${myCards.length} jobs waiting. ${comm} commercial, ${overdue} overdue.\nJobs: ${myCards.map(c=>`"${c.name}"`).join(', ')||'none'}.\n2-3 sentence "what's waiting when you open" summary. Practical, calm.`;
+  if (!myCards.length) {
+    el.textContent = isEve ? 'Board is clear — nothing carrying over. Good night!' : 'Nothing in the queue. Good morning!';
+    return;
+  }
 
-  const summary = await claude(prompt, 300);
-  if (el) el.textContent = summary || 'Board is being monitored. Check back when you open.';
+  const parts = [`${myCards.length} job${myCards.length !== 1 ? 's' : ''} ${isEve ? 'carrying over tonight' : 'waiting when you open'}.`];
+  if (comm) parts.push(`${comm} commercial — handle those first.`);
+  if (overdue) parts.push(`${overdue} job${overdue !== 1 ? 's' : ''} over a week old — needs follow-up.`);
+  const names = myCards.slice(0, 3).map(c => `"${c.name}"`).join(', ');
+  parts.push(`On deck: ${names}${myCards.length > 3 ? ` + ${myCards.length - 3} more` : ''}.`);
+  el.textContent = parts.join(' ');
 }
 
 function enterAfterHours(myCards) {
@@ -1946,7 +1938,6 @@ function populateSettingsForm() {
   document.getElementById('set-trello-token').value   = s.trello?.token   || TRELLO_TOKEN;
   document.getElementById('set-board-name').value     = s.trello?.boardName || BOARD_NAME;
   document.getElementById('set-list-name').value      = s.trello?.listName  || LIST_NAME;
-  document.getElementById('set-anthropic-key').value  = s.anthropic?.key  || ANTHROPIC_KEY;
   document.getElementById('set-coworkers').value      = (s.quoteCoworkers || ['Preston','Trey']).join(', ');
   document.getElementById('set-approval-sound').checked = s.notifications?.approvalSound !== false;
   document.getElementById('set-newcard-sound').checked  = s.notifications?.newCardSound  !== false;
@@ -1973,9 +1964,6 @@ async function saveSettings() {
       token:     document.getElementById('set-trello-token').value.trim(),
       boardName: document.getElementById('set-board-name').value.trim(),
       listName:  document.getElementById('set-list-name').value.trim(),
-    },
-    anthropic: {
-      key: document.getElementById('set-anthropic-key').value.trim(),
     },
     quoteCoworkers: document.getElementById('set-coworkers').value.split(',').map(s => s.trim()).filter(Boolean),
     notifications: {
@@ -2056,11 +2044,6 @@ async function saveSettings() {
         <div class="settings-row"><label>API Token</label><input type="password" id="set-trello-token" class="settings-input"></div>
         <div class="settings-row"><label>Board Name</label><input type="text" id="set-board-name" class="settings-input"></div>
         <div class="settings-row"><label>My List Name</label><input type="text" id="set-list-name" class="settings-input"></div>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-section-title">Claude AI</div>
-        <div class="settings-row"><label>Anthropic API Key</label><input type="password" id="set-anthropic-key" class="settings-input"></div>
       </div>
 
       <div class="settings-section">
