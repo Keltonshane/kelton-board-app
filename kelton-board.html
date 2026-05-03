@@ -2,8 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Lawnsmith Plus — Kelton</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#b91c1c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lawnsmith">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -469,6 +481,204 @@
     white-space: nowrap;
   }
   .ah-return-btn:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.6); }
+
+  /* ── PULL-TO-REFRESH ── */
+  .ptr-indicator {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.22s ease;
+    flex-shrink: 0;
+  }
+  .ptr-indicator.ptr-pulling  { height: 46px; }
+  .ptr-indicator.ptr-spinning { height: 46px; }
+  .ptr-indicator.ptr-spinning .ptr-spin { animation: spin 0.7s linear infinite; }
+  .ptr-spin { width: 14px; height: 14px; border: 2px solid var(--dim); border-top-color: var(--red); border-radius: 50%; flex-shrink: 0; }
+
+  /* ══════════════════════════════════════════════════════
+     MOBILE — phones narrower than 768 px
+  ══════════════════════════════════════════════════════ */
+  @media (max-width: 767px) {
+
+    /* ── Global touch polish ── */
+    * { -webkit-tap-highlight-color: transparent; }
+    button, [role="button"] { touch-action: manipulation; }
+    body { -webkit-user-select: none; user-select: none; }
+    .card-desc, .ai-text, .toast-comment { -webkit-user-select: text; user-select: text; }
+
+    /* ── Safe-area + header ── */
+    header {
+      height: calc(48px + env(safe-area-inset-top, 0px));
+      padding: env(safe-area-inset-top, 0px) 16px 0;
+      align-items: flex-end;
+      padding-bottom: 6px;
+    }
+    .logo-main { font-size: 17px; letter-spacing: 3px; }
+    .logo-sub  { display: none; }
+    .header-center { display: none; }
+    .live-label { display: none; }
+    .live-time  { font-size: 10px; }
+    .settings-gear { font-size: 15px; padding: 4px 6px; }
+
+    /* ── Progress bar ── */
+    .progress-bar { height: 2px; }
+
+    /* ── Weather bar — collapsed by default ── */
+    .weather-bar {
+      padding: 9px 14px;
+      gap: 0;
+      flex-wrap: wrap;
+      cursor: pointer;
+      align-items: center;
+    }
+    .weather-current {
+      flex: 1;
+      border-right: none;
+      padding-right: 0;
+      min-width: 0;
+      gap: 8px;
+    }
+    .weather-icon-big   { font-size: 24px; }
+    .weather-temp-big   { font-size: 20px; }
+    .weather-conditions { display: none; }
+    .weather-meta       { display: none; }
+    .weather-forecast   {
+      display: none;
+      width: 100%;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .weather-forecast::-webkit-scrollbar { display: none; }
+    .weather-analysis   { display: none; width: 100%; margin-top: 6px; }
+
+    /* Expanded state */
+    .weather-bar.m-exp .weather-conditions { display: block; }
+    .weather-bar.m-exp .weather-forecast   { display: flex;  }
+    .weather-bar.m-exp .weather-analysis   { display: flex;  }
+
+    /* Small expand chevron */
+    .weather-m-hint {
+      font-size: 10px;
+      color: var(--dim);
+      margin-left: auto;
+      padding-left: 10px;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .weather-bar.m-exp .weather-m-hint { transform: rotate(180deg); }
+
+    /* ── Briefing bar ── */
+    .briefing-bar  { padding: 7px 14px; }
+    .briefing-text { font-size: 11px; }
+
+    /* ── Offline banner ── */
+    .offline-banner { padding: 5px 14px; }
+
+    /* ── Widgets row ── */
+    .widgets-row { padding: 8px 12px; gap: 8px; flex-direction: column; }
+
+    /* ── Cards area ── */
+    .cards-area {
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 8px 12px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
+    }
+    .job-card { width: 100% !important; }
+    .card-title { font-size: 15px !important; }
+    .job-card:active { transform: scale(0.99); transition: transform 0.1s; }
+
+    /* ── Mention sidebar → bottom sheet ── */
+    .mention-sidebar {
+      top: auto !important;
+      right: 0   !important;
+      bottom: 0  !important;
+      left: 0    !important;
+      width: 100%  !important;
+      height: 0    !important;
+      border-left: none !important;
+      border-top: 0px solid rgba(185,28,28,0.15);
+      transition: height 0.45s cubic-bezier(0.22,1,0.36,1),
+                  border-top-width 0.45s !important;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .mention-sidebar.active {
+      height: 60vh !important;
+      border-top-width: 1px !important;
+    }
+    .board-wrapper.sidebar-active { padding-right: 0 !important; }
+
+    /* Toast slides up from bottom on mobile */
+    @keyframes toastIn { to { transform: translateY(0); } }
+    .mention-toast { transform: translateY(110%); }
+
+    /* ── Settings panel ── */
+    .settings-panel { width: 96vw; max-height: 88vh; }
+    .settings-input { width: 150px; font-size: 12px; }
+
+    /* ── EOD overlay ── */
+    .eod-overlay { padding: 24px 16px; gap: 12px; }
+    .eod-title   { font-size: 22px; letter-spacing: 3px; }
+    .eod-stats   { gap: 20px; }
+    .eod-stat-val { font-size: 30px; }
+    .eod-summary  { font-size: 13px; padding: 12px; }
+
+    /* ── Screensaver ── */
+    .ss-logo-main { font-size: 36px; letter-spacing: 6px; }
+    .ss-clock     { font-size: 72px !important; }
+
+    /* ── After hours ── */
+    .ah-content {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto auto auto auto;
+      gap: 14px;
+      padding: 20px 18px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    }
+    .ah-logo        { grid-column: 1; grid-row: 1; }
+    .ah-clock-block { grid-column: 1; grid-row: 2; text-align: left; }
+    .ah-label       { grid-column: 1; grid-row: 3; }
+    .ah-weather-box { grid-column: 1; grid-row: 4; }
+    .ah-summary-box { grid-column: 1; grid-row: 5; }
+    .ah-divider     { grid-column: 1; grid-row: 6; }
+    .ah-clock       { font-size: 38px; }
+    .ah-label-text  { font-size: 26px; letter-spacing: 5px; }
+    .ah-countdown   { font-size: 14px; }
+
+    /* ── Update / online toasts ── */
+    .update-toast {
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      right: 10px; left: 10px;
+      min-width: 0;
+    }
+    .back-online-toast {
+      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ── Tap feedback on buttons ── */
+    button:active { opacity: 0.7; transition: opacity 0.1s; }
+
+    /* ── Minimum touch target height ── */
+    .widget-header, .eod-dismiss-btn, .settings-btn,
+    .ah-return-btn, .update-toast-install {
+      min-height: 44px;
+    }
+
+  } /* end @media mobile */
 </style>
 </head>
 <body>
@@ -513,11 +723,12 @@
       <div class="weather-meta" id="weatherMeta">Deridder, LA</div>
     </div>
   </div>
+  <div class="weather-m-hint">▾</div>
   <div class="weather-forecast" id="weatherForecast"></div>
   <div class="weather-analysis">
     <span class="weather-analysis-icon">🌦</span>
     <div class="weather-analysis-content">
-      <div class="weather-analysis-label">AI Weather Outlook · Lawnsmith Plus</div>
+      <div class="weather-analysis-label">Weather Outlook · Lawnsmith Plus</div>
       <div class="weather-analysis-text" id="weatherAnalysis">
         <span class="weather-loading">Analyzing the week's forecast for your shop...</span>
       </div>
@@ -526,7 +737,7 @@
 </div>
 
 <div class="briefing-bar" id="briefingBar">
-  <span class="briefing-icon">🤖</span>
+  <span class="briefing-icon">📋</span>
   <div class="briefing-content">
     <div class="briefing-label">Morning Briefing</div>
     <div class="briefing-text" id="briefingText">Loading briefing...</div>
@@ -575,6 +786,10 @@
 <!-- Board: cards only (sidebar is fixed outside) -->
 <div class="board-wrapper" id="boardWrapper">
   <div class="cards-area" id="cardsArea">
+    <div class="ptr-indicator" id="ptrIndicator">
+      <div class="ptr-spin"></div>
+      <span class="ptr-text">Pull to refresh</span>
+    </div>
     <div class="empty-state">
       <div class="icon">⏳</div>
       <p>Connecting to Trello...</p>
@@ -1004,6 +1219,7 @@ async function refresh() {
         const others    = newMain.filter(c => !/approv(al|ed)/i.test(c.name));
         if (approvals.length && appSettings.notifications?.approvalSound !== false) {
           playApprovalSound(vol);
+          haptic([10, 40, 10, 40, 10]);
           approvals.forEach(c => flashApprovalCard(c.id));
         } else if (others.length && appSettings.notifications?.newCardSound !== false) {
           playNewCardSound(vol);
@@ -1078,6 +1294,7 @@ function showMentionToast(id, author, cardName, comment) {
   document.getElementById('mentionSidebar').classList.add('active');
   document.getElementById('boardWrapper').classList.add('sidebar-active');
   playAlertSound(appSettings.notifications?.volume ?? 0.8);
+  haptic([20]);
 
   const toast = document.createElement('div');
   toast.className = 'mention-toast';
@@ -1527,6 +1744,11 @@ async function loadSettings() {
       appSettings = s;
       applySettingsToConfig(s);
     } catch(e) {}
+  } else {
+    try {
+      const stored = localStorage.getItem('kab-settings');
+      if (stored) { appSettings = JSON.parse(stored); applySettingsToConfig(appSettings); }
+    } catch(e) {}
   }
 }
 
@@ -1839,6 +2061,18 @@ function exitAfterHours() {
   initOfflineDetection();
   initUpdateListeners();
   initSettingsPanel();
+  initMobileWeather();
+  initPullToRefresh();
+  initVisibilityHandling();
+  initBatteryAwareness();
+  registerServiceWorker();
+
+  // On mobile, ensure refresh interval is at least 60 s to save battery
+  if (isMobile() && REFRESH_MS < 60000) {
+    REFRESH_MS = 60000;
+    clearInterval(refreshIntervalId);
+    refreshIntervalId = setInterval(refresh, REFRESH_MS);
+  }
 })();
 
 // ── OFFLINE DETECTION ────────────────────────────────────
@@ -1957,6 +2191,97 @@ function populateSettingsForm() {
   document.getElementById('set-mention-user').value   = s.mention?.username ?? MENTION_USERNAME;
 }
 
+// ── MOBILE UTILITIES ─────────────────────────────────────
+function isMobile() {
+  return window.matchMedia('(max-width: 767px)').matches;
+}
+
+function haptic(pattern = [20]) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator && !window.electronAPI) {
+    navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW reg:', e));
+  }
+}
+
+function initMobileWeather() {
+  const bar = document.getElementById('weatherBar');
+  if (!bar) return;
+  bar.addEventListener('click', () => {
+    if (isMobile()) bar.classList.toggle('m-exp');
+  });
+}
+
+function initPullToRefresh() {
+  if (!isMobile()) return;
+  const area = document.getElementById('cardsArea');
+  const ptr  = document.getElementById('ptrIndicator');
+  if (!area || !ptr) return;
+
+  let startY = 0, pulling = false;
+  const THRESHOLD = 64;
+
+  area.addEventListener('touchstart', e => {
+    startY = area.scrollTop === 0 ? e.touches[0].clientY : 0;
+  }, { passive: true });
+
+  area.addEventListener('touchmove', e => {
+    if (!startY) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 8 && area.scrollTop === 0) {
+      pulling = true;
+      ptr.classList.add('ptr-pulling');
+      ptr.querySelector('.ptr-text').textContent =
+        dy >= THRESHOLD ? 'Release to refresh' : 'Pull to refresh';
+    }
+  }, { passive: true });
+
+  area.addEventListener('touchend', () => {
+    if (!pulling) return;
+    pulling = false;
+    startY  = 0;
+    ptr.classList.remove('ptr-pulling');
+    ptr.classList.add('ptr-spinning');
+    ptr.querySelector('.ptr-text').textContent = 'Refreshing...';
+    refresh().catch(() => {}).finally(() => {
+      setTimeout(() => ptr.classList.remove('ptr-spinning'), 400);
+    });
+  }, { passive: true });
+}
+
+function initVisibilityHandling() {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (refreshIntervalId) { clearInterval(refreshIntervalId); refreshIntervalId = null; }
+      if (mentionIntervalId) { clearInterval(mentionIntervalId); mentionIntervalId = null; }
+    } else {
+      refresh();
+      refreshIntervalId = setInterval(refresh, REFRESH_MS);
+      if (!mentionIntervalId)
+        mentionIntervalId = setInterval(checkMentions, REFRESH_MS);
+    }
+  });
+}
+
+async function initBatteryAwareness() {
+  if (!navigator.getBattery) return;
+  try {
+    const bat = await navigator.getBattery();
+    const applyBatteryThrottle = () => {
+      if (!bat.charging && bat.level < 0.2 && REFRESH_MS < 120000) {
+        REFRESH_MS = 120000;
+        if (refreshIntervalId) { clearInterval(refreshIntervalId); refreshIntervalId = setInterval(refresh, REFRESH_MS); }
+        if (mentionIntervalId) { clearInterval(mentionIntervalId); mentionIntervalId = setInterval(checkMentions, REFRESH_MS); }
+      }
+    };
+    bat.addEventListener('levelchange',   applyBatteryThrottle);
+    bat.addEventListener('chargingchange', applyBatteryThrottle);
+    applyBatteryThrottle();
+  } catch(e) {}
+}
+
 async function saveSettings() {
   const newSettings = {
     trello: {
@@ -1997,7 +2322,11 @@ async function saveSettings() {
 
   appSettings = newSettings;
   applySettingsToConfig(newSettings);
-  await window.electronAPI?.writeSettings?.(newSettings);
+  if (window.electronAPI?.writeSettings) {
+    await window.electronAPI.writeSettings(newSettings);
+  } else {
+    try { localStorage.setItem('kab-settings', JSON.stringify(newSettings)); } catch(e) {}
+  }
 
   // Apply live: restart refresh loop if interval changed
   if (refreshIntervalId) { clearInterval(refreshIntervalId); refreshIntervalId = setInterval(refresh, REFRESH_MS); }
