@@ -378,7 +378,7 @@
   .col-card-name    { font-size: 11px; font-weight: 600; color: #cbd5e1; line-height: 1.3; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .col-card-comment { font-size: 10px; color: #475569; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px; }
   .col-card-time    { font-size: 9px; color: var(--dim); }
-  .col-card-progress { height: 1px; background: rgba(185,28,28,0.4); border-radius: 1px; transform-origin: left; margin-top: 6px; animation: colProgress 1800s linear forwards; }
+  .col-card-progress { height: 1px; background: rgba(185,28,28,0.4); border-radius: 1px; transform-origin: left; margin-top: 6px; animation: colProgress 7200s linear forwards; }
   @keyframes colProgress { from{transform:scaleX(1)} to{transform:scaleX(0)} }
   .mention-x { background: none; border: none; color: var(--dim); font-size: 14px; cursor: pointer; line-height: 1; padding: 0; flex-shrink: 0; transition: color 0.15s; }
   .mention-x:hover { color: var(--text); }
@@ -890,7 +890,7 @@ const CLOSE_HOUR = 17; const CLOSE_MIN = 30;
 const BRIEFING_VISIBLE_MIN = 30;
 let LAT = 30.8469; let LON = -93.2860;
 let MENTION_USERNAME    = 'keltondecker';
-const MENTION_DISMISS_MS  = 15 * 60 * 1000;
+const MENTION_DISMISS_MS  = 2 * 60 * 60 * 1000; // 2 hours
 
 const KNOWN_COMMERCIAL = ['commercial','lawn care','landscaping','lawn service','mowing service','grounds'];
 const EQUIP_MAP = {
@@ -907,7 +907,7 @@ let isFirstLoad = true; let eodShown = false;
 let refreshIntervalId = null; let mentionIntervalId = null;
 let isOffline = false; let offlineStart = null; let offlineRetryId = null;
 let weatherCache = null;
-let lastMentionCheck = new Date(Date.now() - 10000).toISOString();
+let lastMentionCheck = new Date(Date.now() - MENTION_DISMISS_MS).toISOString();
 let shownMentionIds  = new Set();
 const activeMentions = new Map();
 
@@ -1350,7 +1350,7 @@ function addToMentionColumn(id, author, cardName, comment) {
     if (el) { const m = Math.floor((Date.now()-born)/60000); el.textContent = m < 1 ? 'just now' : `${m}m ago`; }
   }, 60000);
 
-  const colTimer = setTimeout(() => { clearInterval(timeTick); dismissMention(id); }, 30 * 60 * 1000);
+  const colTimer = setTimeout(() => { clearInterval(timeTick); dismissMention(id); }, MENTION_DISMISS_MS);
   const entry = activeMentions.get(id) || {};
   entry.colTimer = colTimer;
   activeMentions.set(id, entry);
